@@ -10,206 +10,237 @@
     <script src="https://cdn.rawgit.com/ardhi/Leaflet.MousePosition/master/src/L.Control.MousePosition.js"></script>
     <style>
       html, body, #map { width:100%; height:100%; margin:0; padding:0; background: #ffffff; }
-      .leaflet-popup-content { font-family: 'Malgun Gothic', sans-serif; text-align: center; }
-      
-      /* 툴팁 스타일 (마우스 올렸을 때 나타나는 창) */
+      .leaflet-popup-content { font-family: 'Malgun Gothic', sans-serif; text-align: center; font-size: 18px; font-weight: bold; }
       .custom-tooltip {
-        background: rgba(255, 255, 255, 0.9) !important;
-        border: 2px solid #e67e22 !important; /* 십이간지 포인트 색상 */
-        font-weight: bold;
-        color: #333;
-        padding: 5px 10px;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-        font-size: 13px;
+        background: rgba(255, 255, 255, 0.95) !important;
+        border: 3px solid #e67e22 !important;
+        font-weight: bold; color: #333; padding: 10px 15px; border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3); font-size: 20px;
       }
+      .leaflet-control-layers-overlays { font-size: 16px; font-weight: bold; line-height: 1.8; }
+      /* 약초 그룹 레이블 스타일 */
+      .herb-group-label { color: #8e44ad; border-bottom: 2px solid #8e44ad; display: block; margin-top: 10px; margin-bottom: 5px; }
     </style>
   </head>
   <body>
     <div id="map"></div>
     <script type="text/javascript">
-      // [1] 지도 기본 설정 (7300 x 6494 해상도 적용)
       var imageUrl = 'map.jpg'; 
-      var imgW = 7300;
-      var imgH = 6494;
+      var imgW = 7300; var imgH = 6494;
       var mapExtent = [0, -imgH, imgW, 0];
       var imageBounds = [[mapExtent[1], mapExtent[0]], [mapExtent[3], mapExtent[2]]];
-
       var crs = L.CRS.Simple;
       crs.transformation = new L.Transformation(1, 0, -1, 0);
-
-      var map = new L.Map('map', {
-        maxZoom: 12,
-        minZoom: -5, // 축소 기능 강화
-        crs: crs,
-        noWrap: true,
-        zoomSnap: 0.25
-      });
-
+      var map = new L.Map('map', { maxZoom: 12, minZoom: -5, crs: crs, noWrap: true, zoomSnap: 0.25 });
       L.imageOverlay(imageUrl, imageBounds).addTo(map);
       map.fitBounds(imageBounds);
 
-      // [2] 좌표 변환 기준 (다겸님이 주신 새로운 스폰 픽셀 좌표)
-      var mcSpawnPxX = 3218; 
-      var mcSpawnPxY = 2874; 
-      var mcSpawnCoordX = -971;
-      var mcSpawnCoordZ = -965;
-
+      var mcSpawnPxX = 3218; var mcSpawnPxY = 2874; var mcSpawnCoordX = -971; var mcSpawnCoordZ = -965;
       function mcToPx(mcX, mcZ) {
         var scale = 7300 / 16384; 
-        var deltaX = (mcX - mcSpawnCoordX) * scale;
-        var deltaZ = (mcZ - mcSpawnCoordZ) * scale;
-        return [-(mcSpawnPxY + deltaZ), mcSpawnPxX + deltaX];
+        return [-(mcSpawnPxY + (mcZ - mcSpawnCoordZ) * scale), mcSpawnPxX + (mcX - mcSpawnCoordX) * scale];
       }
 
-      // [3] 아이콘 생성 함수 (광산, 약초용)
       function createHtmlIcon(color, label, isHerb = false) {
+        var size = isHerb ? 42 : 50;
         return L.divIcon({
           className: 'custom-icon',
-          html: `<svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="${color}" stroke="white" stroke-width="1"/></svg>
-                 <span style="position:absolute; top:-20px; left:50%; transform:translateX(-50%); background:white; padding:1px 6px; border-radius:10px; border:2px solid ${color}; font-size:12px; color:${color}; font-weight:bold; white-space:nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">${label}</span>`,
-          iconSize: [24, 24], iconAnchor: [12, 24], popupAnchor: [0, -20]
+          html: `<svg width="${size}" height="${size}" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="${color}" stroke="white" stroke-width="1"/></svg>
+                 <span style="position:absolute; top:-35px; left:50%; transform:translateX(-50%); background:white; padding:3px 10px; border-radius:12px; border:3px solid ${color}; font-size:22px; color:${color}; font-weight:bold; white-space:nowrap; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">${label}</span>`,
+          iconSize: [size, size], iconAnchor: [size/2, size], popupAnchor: [0, -size]
         });
       }
 
-      // [추가] 십이간지 전용 아이콘 생성 함수 (마커 없애기)
       function createZodiacIcon(label) {
         return L.divIcon({
           className: 'zodiac-icon',
-          // SVG 마커는 지우고, 라벨만 표시 (평소에는 안 보임)
-          html: `<span style="position:absolute; top:-10px; left:50%; transform:translateX(-50%); background:white; padding:2px 8px; border-radius:10px; border:2px solid #e67e22; font-size:12px; color:#e67e22; font-weight:bold; white-space:nowrap; opacity:0; transition:opacity 0.2s;">${label}</span>`,
-          iconSize: [1, 1], // 아이콘 크기를 최소화하여 클릭 영역을 없앰
-          iconAnchor: [0, 0]
+          html: `<span style="position:absolute; top:-20px; left:50%; transform:translateX(-50%); background:white; padding:5px 15px; border-radius:12px; border:3px solid #e67e22; font-size:24px; color:#e67e22; font-weight:bold; white-space:nowrap; opacity:0; transition:opacity 0.2s;">${label}</span>`,
+          iconSize: [60, 60], iconAnchor: [30, 30]
         });
       }
 
-      // [4] 데이터 레이어 생성
+      // [1] 데이터 및 레이어 설정
       var poiLayers = { 
-        '스폰': L.layerGroup(), 
-        '녹 지점': L.layerGroup(), 
-        '청 지점': L.layerGroup(), 
-        '황 지점': L.layerGroup(), 
-        '적 지점': L.layerGroup(), 
-        '약초 지점': L.layerGroup(),
-        '십이간지': L.layerGroup() 
+        '스폰': L.layerGroup(), '십이간지': L.layerGroup(),
+        '녹색광산': L.layerGroup(), '청색광산': L.layerGroup(), 
+        '황색광산': L.layerGroup(), '적색광산': L.layerGroup()
+      };
+      
+      var herbLayers = {}; // 약초별 개별 레이어 주머니
+
+      // --- 데이터 (기존 데이터 유지) ---
+      var poiData = [ { name: "스폰", type: "스폰", color: "#333", coords: mcToPx(-971, -965) }, { name: "1", type: "녹", color: "#2ecc71", coords: mcToPx(-1093, -701) }, { name: "2", type: "녹", color: "#2ecc71", coords: mcToPx(-1038, -14) }, { name: "3", type: "녹", color: "#2ecc71", coords: mcToPx(-1837, -944) }, { name: "4", type: "녹", color: "#2ecc71", coords: mcToPx(-2599, -2691) }, { name: "5", type: "녹", color: "#2ecc71", coords: mcToPx(-4001, -1579) }, { name: "6", type: "녹", color: "#2ecc71", coords: mcToPx(1085, 199) }, { name: "7", type: "녹", color: "#2ecc71", coords: mcToPx(-775, -1986) }, { name: "8", type: "녹", color: "#2ecc71", coords: mcToPx(2605, -1142) }, { name: "9", type: "녹", color: "#2ecc71", coords: mcToPx(752, -1272) }, { name: "10", type: "청", color: "#3498db", coords: mcToPx(-4322, -2810) }, { name: "11", type: "황", color: "#f1c40f", coords: mcToPx(815, 2558) }, { name: "12", type: "황", color: "#f1c40f", coords: mcToPx(-1913, 3153) }, { name: "13", type: "황", color: "#f1c40f", coords: mcToPx(-3094, 855) }, { name: "14", type: "청", color: "#3498db", coords: mcToPx(7137, -1668) }, { name: "15", type: "청", color: "#3498db", coords: mcToPx(6123, 486) }, { name: "16", type: "청", color: "#3498db", coords: mcToPx(5709, -3342) }, { name: "17", type: "적", color: "#e74c3c", coords: mcToPx(3806, 5436) }, { name: "18", type: "적", color: "#e74c3c", coords: mcToPx(3542, 6378) }, { name: "19", type: "적", color: "#e74c3c", coords: mcToPx(-6250, 2367) }, { name: "20", type: "적", color: "#e74c3c", coords: mcToPx(-7547, 623) }, { name: "21", type: "청", color: "#3498db", coords: mcToPx(-2854, -5529) }, { name: "22", type: "청", color: "#3498db", coords: mcToPx(-5186, 1256) }, { name: "23", type: "녹", color: "#2ecc71", coords: mcToPx(4301, -3381) }, { name: "24", type: "청", color: "#3498db", coords: mcToPx(5584, 3322) }, { name: "25", type: "적", color: "#e74c3c", coords: mcToPx(1998, 4657) }, { name: "26", type: "녹", color: "#2ecc71", coords: mcToPx(2201, -2740) }, { name: "27", type: "적", color: "#e74c3c", coords: mcToPx(-6540, 516) }, { name: "28", type: "황", color: "#f1c40f", coords: mcToPx(3701, 2080) }, { name: "29", type: "황", color: "#f1c40f", coords: mcToPx(-4084, 3035) }, { name: "30", type: "적", color: "#e74c3c", coords: mcToPx(6217, 4562) }, { name: "31", type: "녹", color: "#2ecc71", coords: mcToPx(-563, -6176) }, { name: "32", type: "녹", color: "#2ecc71", coords: mcToPx(1472, -6472) }, { name: "33", type: "녹", color: "#2ecc71", coords: mcToPx(4214, -4596) }, { name: "34", type: "녹", color: "#2ecc71", coords: mcToPx(1941, -5632) }, { name: "35", type: "청", color: "#3498db", coords: mcToPx(-4657, -4523) }, { name: "36", type: "청", color: "#3498db", coords: mcToPx(-4830, -4303) }, { name: "37", type: "청", color: "#3498db", coords: mcToPx(-5480, -1720) }, { name: "38", type: "적", color: "#e74c3c", coords: mcToPx(-6696, -1145) }, { name: "39", type: "녹", color: "#2ecc71", coords: mcToPx(-559, -4593) }, { name: "40", type: "적", color: "#e74c3c", coords: mcToPx(1487, 5300) }, { name: "41", type: "적", color: "#e74c3c", coords: mcToPx(1601, 5485) }, { name: "42", type: "적", color: "#e74c3c", coords: mcToPx(2129, 6598) }, { name: "43", type: "황", color: "#f1c40f", coords: mcToPx(-960, 2033) }, { name: "44", type: "황", color: "#f1c40f", coords: mcToPx(-2468, 4433) }, { name: "45", type: "적", color: "#e74c3c", coords: mcToPx(-5443, 4139) }, { name: "46", type: "적", color: "#e74c3c", coords: mcToPx(4024, 3356) }, { name: "47", type: "황", color: "#f1c40f", coords: mcToPx(658, 3900) }, { name: "48", type: "녹", color: "#2ecc71", coords: mcToPx(-2121, -3837) }, { name: "49", type: "청", color: "#3498db", coords: mcToPx(4886, 954) }, { name: "50", type: "청", color: "#3498db", coords: mcToPx(4942, -1189) }, { name: "51", type: "황", color: "#f1c40f", coords: mcToPx(677, 1433) }, { name: "52", type: "녹", color: "#2ecc71", coords: mcToPx(-762, -6601) }, { name: "53", type: "녹", color: "#2ecc71", coords: mcToPx(2657, -5891) }, { name: "54", type: "녹", color: "#2ecc71", coords: mcToPx(2036, -3624) }, { name: "55", type: "청", color: "#3498db", coords: mcToPx(-4098, -55) }, { name: "56", type: "녹", color: "#2ecc71", coords: mcToPx(-2006, 127) }, { name: "57", type: "녹", color: "#2ecc71", coords: mcToPx(-2264, -1571) }, { name: "58", type: "녹", color: "#2ecc71", coords: mcToPx(3885, -1415) }, { name: "59", type: "청", color: "#3498db", coords: mcToPx(-5054, -2598) }, { name: "60", type: "적", color: "#e74c3c", coords: mcToPx(3323, 3939) }, { name: "61", type: "적", color: "#e74c3c", coords: mcToPx(5258, 5723) }, { name: "62", type: "녹", color: "#2ecc71", coords: mcToPx(1014, -2648) }, { name: "63", type: "황", color: "#f1c40f", coords: mcToPx(2705, 2461) }, { name: "64", type: "황", color: "#f1c40f", coords: mcToPx(-4029, 2321) }, { name: "65", type: "황", color: "#f1c40f", coords: mcToPx(-790, 4284) } ];
+      var herbData = [ { name: "빙백설화", label: "빙", coords: mcToPx(6630, -264) }, { name: "빙백설화", label: "빙", coords: mcToPx(6017, -203) }, { name: "철목영지", label: "철", coords: mcToPx(-3901, 2699) }, { name: "월계엽", label: "월", coords: mcToPx(-1622, -6433) }, { name: "금향과", label: "금", coords: mcToPx(-702, 730) }, { name: "금향과", label: "금", coords: mcToPx(-772, 1917) }, { name: "녹태", label: "녹", coords: mcToPx(-306, -1122) }, { name: "녹태", label: "녹", coords: mcToPx(1110, -2830) }, { name: "녹태", label: "녹", coords: mcToPx(-1934, 26) }, { name: "황초", label: "황", coords: mcToPx(-1376, -346) }, { name: "황초", label: "황", coords: mcToPx(3348, -4641) }, { name: "황초", label: "황", coords: mcToPx(-4178, -4879) }, { name: "적주과", label: "적", coords: mcToPx(-1070, 752) }, { name: "적주과", label: "적", coords: mcToPx(-3964, 1223) }, { name: "옥취엽", label: "옥", coords: mcToPx(-3884, -2432) }, { name: "옥취엽", label: "옥", coords: mcToPx(800, -2112) }, { name: "옥취엽", label: "옥", coords: mcToPx(-1323, -588) }, { name: "옥향초", label: "옥", coords: mcToPx(6408, 4024) }, { name: "옥향초", label: "옥", coords: mcToPx(4800, 3752) }, { name: "인삼", label: "인", coords: mcToPx(1432, 4072) }, { name: "인삼", label: "인", coords: mcToPx(-4705, 765) }, { name: "자운초", label: "자", coords: mcToPx(2744, 4672) }, { name: "자운초", label: "자", coords: mcToPx(4032, 4176) }, { name: "생강", label: "생", coords: mcToPx(1248, 5784) }, { name: "생강", label: "생", coords: mcToPx(-4713, 2168) }, { name: "생강", label: "생", coords: mcToPx(1485, 3133) }, { name: "민들레", label: "민", coords: mcToPx(-3128, -5376) }, { name: "민들레", label: "민", coords: mcToPx(1352, -6136) }, { name: "영군버섯", label: "영", coords: mcToPx(-1744, -6288) }, { name: "영군버섯", label: "영", coords: mcToPx(733, 5074) }, { name: "금양광초", label: "금", coords: mcToPx(3633, 1015) }, { name: "금양광초", label: "금", coords: mcToPx(3362, 2698) }, { name: "권엽", label: "권", coords: mcToPx(-4543, -694) }, { name: "권엽", label: "권", coords: mcToPx(-4386, 142) }, { name: "흑성과", label: "흑", coords: mcToPx(-1671, -3534) }, { name: "흑성과", label: "흑", coords: mcToPx(1578, -128) }, { name: "백향초", label: "백", coords: mcToPx(-5488, 4162) } ];
+      var zodiacData = [ { name: "소", x: -616, z: 3889 }, { name: "닭", x: 5075, z: -344 }, { name: "토끼", x: 4590, z: -3397 }, { name: "뱀", x: 2685, z: -4051 }, { name: "돼지", x: -3657, z: 1112 }, { name: "개", x: -4455, z: -2376 }, { name: "말", x: -2365, z: 3968 }, { name: "원숭이", x: 3280, z: 2952 }, { name: "양", x: 5093, z: 2092 }, { name: "호랑이", x: -5500, z: -1600 }, { name: "용", x: -891, z: -536 }, { name: "쥐", x: -2900, z: -4600 } ];
+
+// [새로 추가] 약초별 구역(Circle) 색상 매핑
+      var herbColors = {
+        "빙백설화": "#3498db", // 파랑
+        "철목영지": "#e67e22", // 주황
+        "월계엽": "#2ecc71",   // 초록
+        "금향과": "#f1c40f",   // 노랑
+        "녹태": "#16a085",     // 진한 녹색
+        "황초": "#f39c12",     // 진한 주황
+        "적주과": "#e74c3c",   // 빨강
+        "옥취엽": "#d35400",   // 갈색
+        "옥향초": "#8e44ad",   // 보라
+        "인삼": "#c0392b",     // 진한 빨강
+        "자운초": "#9b59b6",   // 연한 보라
+        "생강": "#7f8c8d",     // 회색
+        "민들레": "#e67e22",   // 밝은 주황
+        "영군버섯": "#2980b9", // 진한 파랑
+        "금양광초": "#f1c40f", // 밝은 노랑
+        "권엽": "#27ae60",     // 밝은 녹색
+        "흑성과": "#2c3e50",   // 어두운 파랑
+        "백향초": "#ecf0f1"    // 아주 연한 회색 (배경색에 따라 조정 필요)
       };
 
-      // 광산 데이터
-      var poiData = [
-        { name: "스폰", type: "스폰", color: "#333", coords: mcToPx(-971, -965) },
-        { name: "1", type: "녹", color: "#2ecc71", coords: mcToPx(-1093, -701) }, { name: "2", type: "녹", color: "#2ecc71", coords: mcToPx(-1038, -14) },
-        { name: "3", type: "녹", color: "#2ecc71", coords: mcToPx(-1837, -944) }, { name: "4", type: "녹", color: "#2ecc71", coords: mcToPx(-2599, -2691) },
-        { name: "5", type: "녹", color: "#2ecc71", coords: mcToPx(-4001, -1579) }, { name: "6", type: "녹", color: "#2ecc71", coords: mcToPx(1085, 199) },
-        { name: "7", type: "녹", color: "#2ecc71", coords: mcToPx(-775, -1986) }, { name: "8", type: "녹", color: "#2ecc71", coords: mcToPx(2605, -1142) },
-        { name: "9", type: "녹", color: "#2ecc71", coords: mcToPx(752, -1272) }, { name: "10", type: "청", color: "#3498db", coords: mcToPx(-4322, -2810) },
-        { name: "11", type: "황", color: "#f1c40f", coords: mcToPx(815, 2558) }, { name: "12", type: "황", color: "#f1c40f", coords: mcToPx(-1913, 3153) },
-        { name: "13", type: "황", color: "#f1c40f", coords: mcToPx(-3094, 855) }, { name: "14", type: "청", color: "#3498db", coords: mcToPx(7137, -1668) },
-        { name: "15", type: "청", color: "#3498db", coords: mcToPx(6123, 486) }, { name: "16", type: "청", color: "#3498db", coords: mcToPx(5709, -3342) },
-        { name: "17", type: "적", color: "#e74c3c", coords: mcToPx(3806, 5436) }, { name: "18", type: "적", color: "#e74c3c", coords: mcToPx(3542, 6378) },
-        { name: "19", type: "적", color: "#e74c3c", coords: mcToPx(-6250, 2367) }, { name: "20", type: "적", color: "#e74c3c", coords: mcToPx(-7547, 623) },
-        { name: "21", type: "청", color: "#3498db", coords: mcToPx(-2854, -5529) }, { name: "22", type: "청", color: "#3498db", coords: mcToPx(-5186, 1256) },
-        { name: "23", type: "녹", color: "#2ecc71", coords: mcToPx(4301, -3381) }, { name: "24", type: "청", color: "#3498db", coords: mcToPx(5584, 3322) },
-        { name: "25", type: "적", color: "#e74c3c", coords: mcToPx(1998, 4657) }, { name: "26", type: "녹", color: "#2ecc71", coords: mcToPx(2201, -2740) },
-        { name: "27", type: "적", color: "#e74c3c", coords: mcToPx(-6540, 516) }, { name: "28", type: "황", color: "#f1c40f", coords: mcToPx(3701, 2080) },
-        { name: "29", type: "황", color: "#f1c40f", coords: mcToPx(-4084, 3035) }, { name: "30", type: "적", color: "#e74c3c", coords: mcToPx(6217, 4562) },
-        { name: "31", type: "녹", color: "#2ecc71", coords: mcToPx(-563, -6176) }, { name: "32", type: "녹", color: "#2ecc71", coords: mcToPx(1472, -6472) },
-        { name: "33", type: "녹", color: "#2ecc71", coords: mcToPx(4214, -4596) }, { name: "34", type: "녹", color: "#2ecc71", coords: mcToPx(1941, -5632) },
-        { name: "35", type: "청", color: "#3498db", coords: mcToPx(-4657, -4523) }, { name: "36", type: "청", color: "#3498db", coords: mcToPx(-4830, -4303) },
-        { name: "37", type: "청", color: "#3498db", coords: mcToPx(-5480, -1720) }, { name: "38", type: "적", color: "#e74c3c", coords: mcToPx(-6696, -1145) },
-        { name: "39", type: "녹", color: "#2ecc71", coords: mcToPx(-559, -4593) }, { name: "40", type: "적", color: "#e74c3c", coords: mcToPx(1487, 5300) },
-        { name: "41", type: "적", color: "#e74c3c", coords: mcToPx(1601, 5485) }, { name: "42", type: "적", color: "#e74c3c", coords: mcToPx(2129, 6598) },
-        { name: "43", type: "황", color: "#f1c40f", coords: mcToPx(-960, 2033) }, { name: "44", type: "황", color: "#f1c40f", coords: mcToPx(-2468, 4433) },
-        { name: "45", type: "적", color: "#e74c3c", coords: mcToPx(-5443, 4139) }, { name: "46", type: "적", color: "#e74c3c", coords: mcToPx(4024, 3356) },
-        { name: "47", type: "황", color: "#f1c40f", coords: mcToPx(658, 3900) }, { name: "48", type: "녹", color: "#2ecc71", coords: mcToPx(-2121, -3837) },
-        { name: "49", type: "청", color: "#3498db", coords: mcToPx(4886, 954) }, { name: "50", type: "청", color: "#3498db", coords: mcToPx(4942, -1189) },
-        { name: "51", type: "황", color: "#f1c40f", coords: mcToPx(677, 1433) }, { name: "52", type: "녹", color: "#2ecc71", coords: mcToPx(-762, -6601) },
-        { name: "53", type: "녹", color: "#2ecc71", coords: mcToPx(2657, -5891) }, { name: "54", type: "녹", color: "#2ecc71", coords: mcToPx(2036, -3624) },
-        { name: "55", type: "청", color: "#3498db", coords: mcToPx(-4098, -55) }, { name: "56", type: "녹", color: "#2ecc71", coords: mcToPx(-2006, 127) },
-        { name: "57", type: "녹", color: "#2ecc71", coords: mcToPx(-2264, -1571) }, { name: "58", type: "녹", color: "#2ecc71", coords: mcToPx(3885, -1415) },
-        { name: "59", type: "청", color: "#3498db", coords: mcToPx(-5054, -2598) }, { name: "60", type: "적", color: "#e74c3c", coords: mcToPx(3323, 3939) },
-        { name: "61", type: "적", color: "#e74c3c", coords: mcToPx(5258, 5723) }, { name: "62", type: "녹", color: "#2ecc71", coords: mcToPx(1014, -2648) },
-        { name: "63", type: "황", color: "#f1c40f", coords: mcToPx(2705, 2461) }, { name: "64", type: "황", color: "#f1c40f", coords: mcToPx(-4029, 2321) },
-        { name: "65", type: "황", color: "#f1c40f", coords: mcToPx(-790, 4284) }
-      ];
-
-      // 약초 데이터
-      var herbData = [
-        { name: "빙백설화", label: "빙", coords: mcToPx(6630, -264) }, { name: "빙백설화", label: "빙", coords: mcToPx(6017, -203) },
-        { name: "철목영지", label: "철", coords: mcToPx(-3901, 2699) }, { name: "월계엽", label: "월", coords: mcToPx(-1622, -6433) },
-        { name: "금향과", label: "금", coords: mcToPx(-702, 730) }, { name: "금향과", label: "금", coords: mcToPx(-772, 1917) },
-        { name: "녹태", label: "녹", coords: mcToPx(-306, -1122) }, { name: "녹태", label: "녹", coords: mcToPx(1110, -2830) }, { name: "녹태", label: "녹", coords: mcToPx(-1934, 26) },
-        { name: "황초", label: "황", coords: mcToPx(-1376, -346) }, { name: "황초", label: "황", coords: mcToPx(3348, -4641) }, { name: "황초", label: "황", coords: mcToPx(-4178, -4879) },
-        { name: "적주과", label: "적", coords: mcToPx(-1070, 752) }, { name: "적주과", label: "적", coords: mcToPx(-3964, 1223) },
-        { name: "옥취엽", label: "옥", coords: mcToPx(-3884, -2432) }, { name: "옥취엽", label: "옥", coords: mcToPx(800, -2112) }, { name: "옥취엽", label: "옥", coords: mcToPx(-1323, -588) },
-        { name: "옥향초", label: "옥", coords: mcToPx(6408, 4024) }, { name: "옥향초", label: "옥", coords: mcToPx(4800, 3752) },
-        { name: "인삼", label: "인", coords: mcToPx(1432, 4072) }, { name: "인삼", label: "인", coords: mcToPx(-4705, 765) },
-        { name: "자운초", label: "자", coords: mcToPx(2744, 4672) }, { name: "자운초", label: "자", coords: mcToPx(4032, 4176) },
-        { name: "생강", label: "생", coords: mcToPx(1248, 5784) }, { name: "생강", label: "생", coords: mcToPx(-4713, 2168) }, { name: "생강", label: "생", coords: mcToPx(1485, 3133) },
-        { name: "민들레", label: "민", coords: mcToPx(-3128, -5376) }, { name: "민들레", label: "민", coords: mcToPx(1352, -6136) },
-        { name: "영군버섯", label: "영", coords: mcToPx(-1744, -6288) }, { name: "영군버섯", label: "영", coords: mcToPx(733, 5074) },
-        { name: "금양광초", label: "금", coords: mcToPx(3633, 1015) }, { name: "금양광초", label: "금", coords: mcToPx(3362, 2698) },
-        { name: "권엽", label: "권", coords: mcToPx(-4543, -694) }, { name: "권엽", label: "권", coords: mcToPx(-4386, 142) },
-        { name: "흑성과", label: "흑", coords: mcToPx(-1671, -3534) }, { name: "흑성과", label: "흑", coords: mcToPx(1578, -128) },
-        { name: "백향초", label: "백", coords: mcToPx(-5488, 4162) }
-      ];
-
-      // 십이간지 데이터 (라벨/좌표만 호버 시 표시)
-      var zodiacData = [
-        { name: "소", x: -616, z: 3889 }, { name: "닭", x: 5075, z: -344 },
-        { name: "토끼", x: 4590, z: -3397 }, { name: "뱀", x: 2685, z: -4051 },
-        { name: "돼지", x: -3657, z: 1112 }, { name: "개", x: -4455, z: -2376 },
-        { name: "말", x: -2365, z: 3968 }, { name: "원숭이", x: 3280, z: 2952 },
-        { name: "양", x: 5093, z: 2092 }, { name: "호랑이", x: -5500, z: -1600 },
-        { name: "용", x: -891, z: -536 }, { name: "쥐", x: -2900, z: -4600 }
-      ];
-
-      // [5] 마커 렌더링
-      // 광산 마커
+      // [2] 마커 및 구역 렌더링
       poiData.forEach(function(poi) {
-        var groupKey = poi.type === '스폰' ? '스폰' : poi.type + ' 지점';
-        L.marker(poi.coords, {icon: createHtmlIcon(poi.color, poi.name)}).addTo(poiLayers[groupKey])
-          .bindPopup(`<div class="poi-title">${poi.name}번 광산</div>`);
+        var groupKey;
+        if (poi.type === '스폰') groupKey = '스폰';
+        else if (poi.type === '녹') groupKey = '녹색광산';
+        else if (poi.type === '청') groupKey = '청색광산';
+        else if (poi.type === '황') groupKey = '황색광산';
+        else if (poi.type === '적') groupKey = '적색광산';
+        L.marker(poi.coords, {icon: createHtmlIcon(poi.color, poi.name)}).addTo(poiLayers[groupKey]).bindPopup(`<b>${poi.name}번 광산</b>`);
       });
 
-      // 약초 마커
-      herbData.forEach(function(herb) {
-        L.marker(herb.coords, {icon: createHtmlIcon('#8e44ad', herb.label, true)}).addTo(poiLayers['약초 지점'])
-          .bindPopup(`<div class="herb-title">${herb.name}</div>`);
+herbData.forEach(function(herb) {
+        if (!herbLayers[herb.name]) herbLayers[herb.name] = L.layerGroup();
+        
+        // 1. 해당 약초의 고유 색상 가져오기 (없으면 기본 보라색)
+        var herbColor = herbColors[herb.name] || '#9b59b6';
+
+        // 2. 마커 생성
+        L.marker(herb.coords, {icon: createHtmlIcon('#8e44ad', herb.label, true)})
+         .addTo(herbLayers[herb.name])
+         .bindPopup(`<b>${herb.name}</b>`);
+
+        // 3. 군락지 원형 영역 (고유 색상 적용 및 반지름 조정)
+        L.circle(herb.coords, { 
+          color: herbColor,      // 테두리 색상 적용
+          fillColor: herbColor,  // 채우기 색상 적용
+          fillOpacity: 0.15, 
+          radius: 100            // 이전 이미지 느낌에 맞춰 180으로 키웠습니다.
+        }).addTo(herbLayers[herb.name]);
       });
 
-      // 십이간지 마커 (마커 없애고 툴팁/호버만 설정)
       zodiacData.forEach(function(z) {
-        var pos = mcToPx(z.x, z.z);
-        L.marker(pos, { 
-            icon: createZodiacIcon(z.name), // 마커 없는 투명 아이콘 적용
-            riseOnHover: true // 마우스 올리면 라벨이 위로 올라오게 함
-        })
-          .addTo(poiLayers['십이간지'])
-          .bindTooltip(`<b>${z.name}</b><br>좌표: ${z.x}, ${z.z}`, {
-            direction: 'top',
-            className: 'custom-tooltip',
-            sticky: true,
-            opacity: 0.9
-          })
-          .on('mouseover', function(e) {
-            // 마우스 올리면 아이콘 내 숨겨진 라벨 표시
-            this.getElement().querySelector('span').style.opacity = 1;
-          })
-          .on('mouseout', function(e) {
-            // 마우스 떼면 다시 숨김
-            this.getElement().querySelector('span').style.opacity = 0;
+        // 1. 마커 생성 및 툴팁 바인딩
+        var zodiacMarker = L.marker(mcToPx(z.x, z.z), { 
+          icon: createZodiacIcon(z.name), 
+          riseOnHover: true 
+        }).addTo(poiLayers['십이간지']);
+
+        // 2. 툴팁 설정 (마우스 올리면 나오는 창)
+        zodiacMarker.bindTooltip(
+          `<div style="text-align:center;">
+            <b style="font-size:22px;">${z.name}</b><br>
+            <span style="font-size:16px;">MC 좌표: ${z.x}, ${z.z}</span>
+          </div>`, 
+          { 
+            direction: 'top', 
+            className: 'custom-tooltip', // 위에서 정의한 스타일 적용
+            sticky: false, 
+            opacity: 0.95,
+            offset: [0, -20] // 창 위치 살짝 위로 조절
+          }
+        );
+
+        // 3. 마우스 오버 시 아이콘 내부의 텍스트 레이블도 함께 표시되도록 처리
+        zodiacMarker.on('mouseover', function() { 
+          var el = this.getElement();
+          if(el) el.querySelector('span').style.opacity = 1; 
+        });
+        zodiacMarker.on('mouseout', function() { 
+          var el = this.getElement();
+          if(el) el.querySelector('span').style.opacity = 0; 
+        });
+      });
+
+      // [3] 초기 활성화 설정 (스폰과 십이간지만 켜기)
+      poiLayers['스폰'].addTo(map);
+      poiLayers['십이간지'].addTo(map);
+
+// [4] 메뉴 구성 및 전체 선택 로직
+
+      // 약초들을 하나의 그룹으로 묶을 레이어 (전체 제어용)
+      var allHerbsGroup = L.layerGroup();
+
+      var menuOrder = {
+        "스폰": poiLayers['스폰'],
+        "십이간지": poiLayers['십이간지'],
+        "녹색광산": poiLayers['녹색광산'],
+        "청색광산": poiLayers['청색광산'],
+        "황색광산": poiLayers['황색광산'],
+        "적색광산": poiLayers['적색광산'],
+        // '약초 서식지'라는 이름으로 전체를 묶는 체크박스 생성
+        "<span class='herb-group-label' style='cursor:pointer;'>🌿 약초 서식지 (전체 선택)</span>": allHerbsGroup
+      };
+
+      // 개별 약초 레이어들을 메뉴에 추가
+      var herbNames = Object.keys(herbLayers).sort();
+      herbNames.forEach(function(name) {
+        menuOrder[name] = herbLayers[name];
+      });
+
+      // 메뉴 생성
+      var layerControl = L.control.layers(null, menuOrder, {collapsed: false}).addTo(map);
+
+// [4] 전체 선택/해제 이벤트 및 UI 동기화 로직
+
+      map.on('overlayadd', function(e) {
+        // '전체 선택' 체크박스를 켰을 때
+        if (e.name.includes('약초 서식지')) {
+          herbNames.forEach(function(name) {
+            if (!map.hasLayer(herbLayers[name])) {
+              map.addLayer(herbLayers[name]);
+              updateLayerCheckbox(name, true); // UI 체크박스 켜기
+            }
           });
+        }
       });
 
-      // [6] 레이어 컨트롤 및 기타 설정
-      for (var key in poiLayers) { poiLayers[key].addTo(map); }
-      L.control.layers(null, poiLayers, {collapsed: false}).addTo(map);
-      L.control.mousePosition({position: 'bottomleft', separator: ', ', prefix: '마우스 위치: '}).addTo(map);
-
-      // 창 크기 조절 대응
-      window.addEventListener('resize', function() {
-        map.invalidateSize();
+      map.on('overlayremove', function(e) {
+        // '전체 선택' 체크박스를 껐을 때
+        if (e.name.includes('약초 서식지')) {
+          herbNames.forEach(function(name) {
+            if (map.hasLayer(herbLayers[name])) {
+              map.removeLayer(herbLayers[name]);
+              updateLayerCheckbox(name, false); // UI 체크박스 끄기 (핵심!)
+            }
+          });
+        }
       });
-    </script>
+
+      // 메뉴 UI(HTML) 내의 실제 체크박스 요소를 찾아서 상태를 바꿔주는 함수
+      function updateLayerCheckbox(name, isChecked) {
+        // Leaflet 메뉴 안의 모든 label 요소를 가져옵니다.
+        var layersContainer = document.querySelector('.leaflet-control-layers-overlays');
+        var labels = layersContainer.querySelectorAll('label');
+        
+        labels.forEach(function(label) {
+          // 레이블 텍스트와 약초 이름이 일치하는지 확인
+          if (label.innerText.trim() === name) {
+            var checkbox = label.querySelector('input');
+            if (checkbox) {
+              checkbox.checked = isChecked; // 체크박스 시각적 상태 변경
+            }
+          }
+        });
+      }
+
+      // 메뉴 UI의 체크박스 상태를 동기화해주는 함수
+      function updateLayerCheckbox(name, isChecked) {
+        var labels = document.querySelectorAll('.leaflet-control-layers-overlays label');
+        labels.forEach(function(label) {
+          if (label.innerText.trim() === name) {
+            label.querySelector('input').checked = isChecked;
+          }
+        });
+      }
+
+      L.control.mousePosition({position: 'bottomleft', separator: ', ', prefix: '좌표: '}).addTo(map);    </script>
   </body>
 </html>
