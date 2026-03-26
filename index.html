@@ -18,8 +18,8 @@
   <body>
     <div id="map"></div>
     <script type="text/javascript">
-      // [1] 지도 설정 및 이미지 정보 (다겸님이 주신 해상도 적용)
-      var imageUrl = 'map.jpg'; // 업로드하신 파일명에 맞췄습니다.
+      // [1] 지도 설정 및 이미지 정보
+      var imageUrl = 'map.jpg'; 
       var imgW = 7300;
       var imgH = 6494;
       var mapExtent = [0, -imgH, imgW, 0];
@@ -30,24 +30,25 @@
 
       var map = new L.Map('map', {
         maxZoom: 12,
-        minZoom: -2,
+        minZoom: -5, // [수정] 마이너스 값을 더 낮춰서 아주 작게까지 축소 가능하게 함
         crs: crs,
-        noWrap: true
+        noWrap: true,
+        zoomSnap: 0.25 // [추가] 줌 조절을 더 부드럽게 세밀하게 조정
       });
 
-      L.imageOverlay(imageUrl, imageBounds).addTo(map);
+      var mapLayer = L.imageOverlay(imageUrl, imageBounds).addTo(map);
+      
+      // [수정] 이미지가 화면에 꽉 차게 보이도록 설정하는 함수
       map.fitBounds(imageBounds);
 
-      // [2] 새로운 스폰 픽셀 좌표 기준 변환 함수
+      // [2] 스폰 픽셀 좌표 기준 변환 함수
       var mcSpawnPxX = 3218; 
       var mcSpawnPxY = 2874; 
       var mcSpawnCoordX = -971;
       var mcSpawnCoordZ = -965;
 
-      // 이미지 축소 비율 계산 (기존 약 16384에서 7300으로 줄어든 비율 반영)
-      // 정확한 비율 적용을 위해 계산 로직을 포함합니다.
       function mcToPx(mcX, mcZ) {
-        var scale = 7300 / 16384; // 원본 대비 현재 이미지의 비율
+        var scale = 7300 / 16384; 
         var deltaX = (mcX - mcSpawnCoordX) * scale;
         var deltaZ = (mcZ - mcSpawnCoordZ) * scale;
         return [-(mcSpawnPxY + deltaZ), mcSpawnPxX + deltaX];
@@ -69,7 +70,6 @@
       // [4] 데이터 레이어 설정
       var poiLayers = { '스폰': L.layerGroup(), '녹 지점': L.layerGroup(), '청 지점': L.layerGroup(), '황 지점': L.layerGroup(), '적 지점': L.layerGroup(), '약초 지점': L.layerGroup() };
 
-      // 광산 데이터
       var poiData = [
         { name: "스폰", type: "스폰", color: "#333", coords: mcToPx(-971, -965) },
         { name: "1", type: "녹", color: "#2ecc71", coords: mcToPx(-1093, -701) }, { name: "2", type: "녹", color: "#2ecc71", coords: mcToPx(-1038, -14) },
@@ -107,7 +107,6 @@
         { name: "65", type: "황", color: "#f1c40f", coords: mcToPx(-790, 4284) }
       ];
 
-      // 약초 데이터
       var herbData = [
         { name: "빙백설화", label: "빙", coords: mcToPx(6630, -264) }, { name: "빙백설화", label: "빙", coords: mcToPx(6017, -203) },
         { name: "철목영지", label: "철", coords: mcToPx(-3901, 2699) }, { name: "월계엽", label: "월", coords: mcToPx(-1622, -6433) },
@@ -143,6 +142,11 @@
       for (var key in poiLayers) { poiLayers[key].addTo(map); }
       L.control.layers(null, poiLayers, {collapsed: false}).addTo(map);
       L.control.mousePosition({position: 'bottomleft', separator: ', ', prefix: '좌표: '}).addTo(map);
+
+      // [추가] 브라우저 창 크기가 바뀌어도 지도가 중앙을 유지하도록 설정
+      window.addEventListener('resize', function() {
+        map.fitBounds(imageBounds);
+      });
     </script>
   </body>
 </html>
