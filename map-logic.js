@@ -2,18 +2,27 @@
 var imgW = 7300, imgH = 6494;
 var imageBounds = [[-imgH, 0], [0, imgW]];
 
-/** 1. 지도 설정 **/
+// 지도가 이미지 밖으로 살짝 더 나갈 수 있게 여유(Pad)를 줍니다.
+// 0.1은 10%, 0.2는 20% 정도의 여백입니다.
+var paddedBounds = L.latLngBounds(imageBounds).pad(0.1); 
+
 var map = new L.Map('map', { 
     maxZoom: 12, 
-    minZoom: -3, 
+    minZoom: -2, 
     crs: L.CRS.Simple, 
     noWrap: true, 
-    zoomSnap: 0.1, // <--- 이 끝에 쉼표(,)가 있는지 꼭 확인하세요!
-    maxBounds: imageBounds 
+    zoomSnap: 0.1,
+    maxBounds: paddedBounds, // 타이트한 imageBounds 대신 여유 있는 paddedBounds 적용
+    maxBoundsViscosity: 0.5   // 이 값을 0~1 사이로 조절하면 경계에서 튕기는 느낌을 부드럽게 만들 수 있습니다.
 });
 
 L.imageOverlay('map.jpg', imageBounds).addTo(map);
+
+// 처음 화면에 맞출 때는 원본 이미지 크기에 맞춥니다.
 map.fitBounds(imageBounds);
+
+// 최소 줌 고정 (이전과 동일)
+map.setMinZoom(map.getBoundsZoom(imageBounds));
 
 /** 2. 아이콘 생성 함수 **/
 function createHtmlIcon(color) {
