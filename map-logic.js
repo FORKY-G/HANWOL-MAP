@@ -1,13 +1,13 @@
 /** 1. 설정 및 기본 변수 **/
 var imgW = 7300, imgH = 6494;
 var imageBounds = [[-imgH, 0], [0, imgW]];
-// 여백을 넉넉히 0.5(50%)까지 늘려서 지도가 더 작아질 공간을 확보합니다.
-var paddedBounds = L.latLngBounds(imageBounds).pad(0.5); 
+// 여백을 적당히 0.3(30%) 정도로 다시 줄입니다.
+var paddedBounds = L.latLngBounds(imageBounds).pad(0.3); 
 
 var map = new L.Map('map', { 
     crs: L.CRS.Simple, 
     noWrap: true, 
-    zoomSnap: 0, // 0으로 설정하면 줌이 끊기지 않고 아주 부드럽게 축소됩니다.
+    zoomSnap: 0.1, // 다시 0.1로 안정화
     maxBounds: paddedBounds,
     maxBoundsViscosity: 0.5
 });
@@ -15,17 +15,17 @@ var map = new L.Map('map', {
 L.imageOverlay('map.jpg', imageBounds).addTo(map);
 
 // [핵심 조치] 
-// 1. 먼저 최소 줌 제한을 완전히 풀어버립니다 (매우 중요)
-map.setMinZoom(-20); 
+// 1. 최소 줌 제한을 일단 넉넉히 -5 정도로만 풉니다.
+map.setMinZoom(-5); 
 
-// 2. 화면에 여백을 대폭(600px) 주고 지도를 맞춥니다. 
-// 이 숫자가 클수록 처음 시작할 때 지도가 더 작게(축소되어) 보입니다.
-map.fitBounds(imageBounds, { padding: [600, 600] });
+// 2. 패딩을 150~200 정도로 주면 섬이 화면에 꽉 차지 않고 적당히 축소되어 보입니다.
+// 섬이 여전히 너무 작다면 100으로 줄이고, 더 작게 보고 싶다면 300으로 늘리세요.
+map.fitBounds(imageBounds, { padding: [150, 150] });
 
-// 3. 지도가 예쁘게 자리 잡은 '지금 이 상태'를 최소 줌으로 고정합니다.
+// 3. 현재의 예쁜 상태를 최소 줌으로 고정합니다.
 var currentZoom = map.getZoom();
 map.setMinZoom(currentZoom); 
-map.setZoom(currentZoom); // 현재 줌으로 다시 한번 고정
+map.setZoom(currentZoom);
 
 /** 2. 아이콘 생성 함수 **/
 function createHtmlIcon(color) {
