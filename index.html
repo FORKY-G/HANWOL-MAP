@@ -448,14 +448,15 @@ var menuOrder = {
     "스폰": poiLayers['스폰'], 
     "십이간지": poiLayers['십이간지'],
     "<span class='divider-line'></span>": L.layerGroup(), 
+    "⛰️ 산(비석)": mountainLayers, // 이 줄을 적절한 위치에 추가
+    "<span class='divider-line'></span>": L.layerGroup(),
     "<span class='mine-group-label'>💎 광산 구역</span>": L.layerGroup(),
 "<span style='color: #2ecc71; font-weight: bold;'>녹색광산</span>": poiLayers['녹색광산'], 
     "<span style='color: #3498db; font-weight: bold;'>청색광산</span>": poiLayers['청색광산'], 
     "<span style='color: #f1c40f; font-weight: bold;'>황색광산</span>": poiLayers['황색광산'], 
     "<span style='color: #e74c3c; font-weight: bold;'>적색광산</span>": poiLayers['적색광산'],
     "<span class='divider-line'></span> ": L.layerGroup(),
-"⛰️ 산(비석)": mountainLayers, // 이 줄을 적절한 위치에 추가
-    "<span class='divider-line'></span>": L.layerGroup(),
+
     // 카테고리 제목 옆에 초기화 버튼 배치 (flex 설정으로 간격 조절)
     "<span class='herb-group-label' style='display:flex; justify-content:space-between; align-items:center; width:140px;'>🌿 약초 서식지 <button onclick='resetHerbLayers()' style='cursor:pointer; font-size:10px; padding:1px 4px; background:#eee; border:1px solid #999;'>초기화</button></span>": L.layerGroup()
 };
