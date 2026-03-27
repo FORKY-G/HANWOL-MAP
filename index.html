@@ -128,6 +128,35 @@
     display: none !important;
 }
 
+/* 모바일 최적화 스타일 */
+@media (max-width: 767px) {
+    /* 1. 레이어 컨트롤의 최대 높이를 제한하고 내부 스크롤 허용 */
+    .leaflet-control-layers-expanded {
+        max-height: 60vh !important; /* 화면 높이의 60%까지만 차지 */
+        overflow-y: auto;
+        width: 180px !important;    /* 너비를 조금 더 슬림하게 조절 */
+        font-size: 12px;             /* 글자 크기를 살짝 줄임 */
+    }
+
+    /* 2. 정보창(패널) 위치 및 크기 조정 */
+    #hunting-info-panel {
+        width: 80% !important;      /* 화면의 80% 정도만 차지 */
+        right: 10px !important;
+        top: 10px !important;
+        max-height: 50vh;
+        overflow-y: auto;
+    }
+
+    /* 3. 약초 서식지 들여쓰기 조절 */
+    .leaflet-control-layers-overlays label:has(.herb-name-clickable) {
+        padding-left: 15px !important; /* 모바일에서는 여백을 약간 줄임 */
+    }
+    
+    .herb-group-label {
+        width: 130px !important; /* 초기화 버튼과 간격 맞춤 */
+    }
+}
+
     </style>
 </head>
 
@@ -390,8 +419,12 @@ Object.keys(herbLayers).sort().forEach(function(name) {
     menuOrder[htmlLabel] = herbLayers[name];
 });
 
-// 레이어 컨트롤 생성 및 지도 추가
-L.control.layers(null, menuOrder, {collapsed: false}).addTo(map);
+// 모바일(화면 너비 768px 미만)일 때는 목록을 접어서 시작하도록 설정
+var isMobile = window.innerWidth < 768;
+
+L.control.layers(null, menuOrder, {
+    collapsed: isMobile  // 모바일이면 true(접힘), PC면 false(펼침)
+}).addTo(map);
 
         function generateHuntingList() {
             const listElement = document.getElementById('hunting-list');
