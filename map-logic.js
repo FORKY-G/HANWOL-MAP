@@ -34,9 +34,12 @@ var mountainLayers = L.layerGroup();
 
 /** 5. 산(비석) & 동상 레이어 생성 로직 **/
 mountainData.forEach(m => {
+    // [핵심 수정] 데이터에 직접 입력한 coords가 있으면 그걸 쓰고, 없으면 mcToPx로 계산합니다.
+    var finalPos = m.coords ? m.coords : mcToPx(m.x, m.z);
+
     if (m.type === "statue") {
         // 동상일 경우 아이콘과 클릭 팝업 설정
-        L.marker(mcToPx(m.x, m.z), { 
+        L.marker(finalPos, {  // finalPos를 사용하여 좌표 결정
             icon: L.divIcon({ className: 'statue-icon', iconSize: [30, 30], iconAnchor: [15, 30] }) 
         }).addTo(mountainLayers)
         .bindPopup(`
@@ -48,7 +51,7 @@ mountainData.forEach(m => {
         `);
     } else {
         // 일반 비석일 경우 기존 로직 유지
-        L.marker(mcToPx(m.x, m.z), { icon: createSteleIcon() }).addTo(mountainLayers)
+        L.marker(finalPos, { icon: createSteleIcon() }).addTo(mountainLayers) // finalPos 사용
          .bindTooltip(`<b>${m.name}</b>`, { direction: 'top', className: 'custom-tooltip' });
     }
 });
