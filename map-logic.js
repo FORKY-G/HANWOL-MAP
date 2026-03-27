@@ -2,7 +2,7 @@
 var imgW = 7300, imgH = 6494;
 var imageBounds = [[-imgH, 0], [0, imgW]];
 var map = new L.Map('map', { 
-    maxZoom: 12, minZoom: -2, crs: L.CRS.Simple, noWrap: true, zoomSnap: 0.1 
+    maxZoom: 12, minZoom: -2, crs: L.CRS.Simple, noWrap: true, zoomSnap: 0.1,
     maxBounds: imageBounds
 });
 
@@ -26,24 +26,24 @@ var mountainLayers = L.layerGroup();
 
 /** 4. 레이어 초기화 로직 (마커 생성 등) **/
 
-// 산(비석)
+/** 산(비석) & 동상 레이어 생성 **/
 mountainData.forEach(m => {
     if (m.type === "statue") {
-        // 동상 마커 생성 (이미지 팝업 포함)
+        // 동상: 아이콘 모양 다르게 + 클릭 시 이미지 팝업
         L.marker(mcToPx(m.x, m.z), { 
             icon: L.divIcon({ className: 'statue-icon', iconSize: [30, 30], iconAnchor: [15, 30] }) 
         }).addTo(mountainLayers)
         .bindPopup(`
             <div style="text-align:center;">
-                <b style="font-size:16px;">${m.name}</b><br>
-                <img src="${m.file}" style="width:180px; height:auto; margin-top:10px; border:2px solid #000;"><br>
-                <span style="color:#555; font-size:12px;">X: ${m.x}, Z: ${m.z}</span>
+                <b style="font-size:14px;">${m.name}</b><br>
+                <img src="${m.file}" style="width:150px; height:auto; border:2px solid #000; margin-top:5px;"><br>
+                <span style="font-size:11px; color:#666;">[${m.x}, ${m.z}]</span>
             </div>
         `);
     } else {
-        // 기존 비석 마커 생성
+        // 일반 비석: 기존 비석 아이콘 + 툴팁
         L.marker(mcToPx(m.x, m.z), { icon: createSteleIcon() }).addTo(mountainLayers)
-        .bindTooltip(`<b style="font-size:16px;">${m.name}</b><br>X: ${m.x}, Z: ${m.z}`, { direction: 'top', className: 'custom-tooltip' });
+         .bindTooltip(`<b>${m.name}</b>`, { direction: 'top', className: 'custom-tooltip' });
     }
 });
 
