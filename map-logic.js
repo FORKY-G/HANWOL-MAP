@@ -1,33 +1,31 @@
 /** 1. 설정 및 기본 변수 **/
 var imgW = 7300, imgH = 6494;
 var imageBounds = [[-imgH, 0], [0, imgW]];
-var paddedBounds = L.latLngBounds(imageBounds).pad(0.1); 
+// 여백을 0.3(30%) 정도로 넉넉히 줍니다.
+var paddedBounds = L.latLngBounds(imageBounds).pad(0.3); 
 
-// 지도를 생성합니다.
 var map = new L.Map('map', { 
-    maxZoom: 8, 
-    minZoom: -10, 
     crs: L.CRS.Simple, 
     noWrap: true, 
-    zoomSnap: 0.1,
+    zoomSnap: 0.1, // 부드러운 줌 조절
     maxBounds: paddedBounds,
     maxBoundsViscosity: 0.5
 });
 
-// [중요] 지도가 사라지지 않게 임시 중심점을 먼저 설정합니다.
-map.setView([-imgH/2, imgW/2], -1); 
-
-// 이미지 레이어를 올립니다.
+// 이미지 레이어 추가
 L.imageOverlay('map.jpg', imageBounds).addTo(map);
 
-// 실제 이미지 크기에 딱 맞게 화면을 재조정합니다.
+// [핵심] 1. 처음 시작할 때 여백(padding)을 대폭 늘려서 맞춥니다.
+// [400, 400] 정도로 주면 지도가 아주 멀리서(작게) 시작됩니다.
 map.fitBounds(imageBounds, { padding: [200, 200] });
 
-var initialZoom = map.getZoom();
-map.setZoom(initialZoom - 10); // 0.7만큼 더 멀리서 시작합니다.
+// [핵심] 2. 지도가 맞춰진 현재 상태를 '초기 줌'이자 '최소 줌'으로 고정합니다.
+var startZoom = map.getZoom();
+map.setMinZoom(startZoom); // 이보다 더 작게는 못 줄이게 막음
+map.setMaxZoom(8);         // 최대 확대는 8까지
 
-// 3. 최소 줌 고정 (사용자가 더 축소하고 싶을 수도 있으니 여유를 둡니다)
-map.setMinZoom(map.getZoom() - 10);
+// 마지막으로 위치 확인 (선택 사항)
+map.setView(map.getCenter(), startZoom);
 
 /** 2. 아이콘 생성 함수 **/
 function createHtmlIcon(color) {
