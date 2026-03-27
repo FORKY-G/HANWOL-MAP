@@ -1,5 +1,7 @@
-// 1. 사냥터 정보창 표시 함수
-function showHuntingInfo(info) {
+/** 1. 함수 정의 (사냥터 이동, 검색, 정보창 등) **/
+
+// 사냥터 정보창 표시 함수
+window.showHuntingInfo = function(info) {
     var panel = document.getElementById('hunting-info-panel');
     panel.innerHTML = `
         <h4 id="panel-name" style="margin: 0;"></h4>
@@ -9,7 +11,6 @@ function showHuntingInfo(info) {
             닫기
         </button>
     `;
-
     document.getElementById('panel-name').innerHTML = `
         <span style="font-size: 24px;"><b>${info.name}</b></span> 
         <span style="font-size: 16px; color: #666;">(${info.lv})</span>
@@ -18,97 +19,21 @@ function showHuntingInfo(info) {
         <div style="margin-top: 8px; font-size: 16px; color: #444;">${info.monsters}</div>
     `;
     panel.style.display = 'block';
-}
+};
 
-// 2. 약초 전용 정보 표시 함수
-window.moveAndShowHerb = function(name, mcX, mcZ, color) {
-    if (!map.hasLayer(herbLayers[name])) {
-        map.addLayer(herbLayers[name]);
+// 사냥터 클릭 이동 로직
+window.moveAndShowHunt = function(name) {
+    var info = huntingInfo.find(h => h.name === name);
+    if (!info) return;
+    if (!map.hasLayer(huntingLayers[name])) {
+        map.addLayer(huntingLayers[name]);
         updateLayerCheckbox(name, true);
     }
-
-    var allLocations = herbData.filter(h => h.name === name);
-    var coordsHtml = allLocations.map(h => `
-        <div style="margin-bottom:5px;">
-            <span style="background:#444; color:#fff; padding:2px 5px; border-radius:3px; font-size:11px; margin-right:5px;">좌표</span>
-            <b style="color:#e74c3c;">X: ${h.mcX} / Z: ${h.mcZ}</b>
-        </div>
-    `).join('');
-
-    var rareHerbs = ["월계엽", "철목영지", "금향과", "빙백설화"];
-    var isRare = rareHerbs.includes(name);
-    var titleExtra = isRare ? ` <span style="color:#e74c3c; font-size:14px;">(희귀)</span>` : "";
-    var descExtra = isRare ? `<div style="font-size:9px; color:#555; margin-top:2px;">희귀 약초는 광범위하게 스폰됩니다.</div>`
-                           : `<div style="font-size:9px; color:#e74c3c; margin-top:2px; font-weight:bold;">위 좌표들은 명확하지 않을 수 있습니다.</div>`;
-
-    var panel = document.getElementById('hunting-info-panel');
-    panel.style.display = 'block';
-    panel.innerHTML = `
-        <div style="border-bottom:3px solid ${color}; padding-bottom:8px; margin-bottom:12px; position:relative;">
-            <b style="font-size:18px; color:#3F3F3F; text-shadow:1px 1px 0px #fff;">${name}</b>${titleExtra}
-            ${descExtra}
-            <span style="position:absolute; right:0; top:0; cursor:pointer; font-weight:bold; padding:5px;" onclick="document.getElementById('hunting-info-panel').style.display='none'">X</span>
-        </div>
-        <div style="font-size:14px; line-height:1.6; background:rgba(255,255,255,0.5); padding:10px; border:1px solid #888; max-height:150px; overflow-y:auto;">
-            ${coordsHtml}
-        </div>
-        <button onclick="document.getElementById('hunting-info-panel').style.display='none'" 
-                style="margin-top:12px; width:100%; cursor:pointer; background:#C6C6C6; border:2px solid #000; box-shadow: inset -2px -2px 0px #555555, inset 2px 2px 0px #ffffff; font-weight:bold; padding:5px;">
-            닫기
-        </button>
-    `;
+    map.setView(info.center, -1);
+    setTimeout(() => showHuntingInfo(info), 100); 
 };
 
-// 3. 검색 실행 함수
-window.executeSearch = function() {
-    var input = document.getElementById('search-input');
-    var query = input.value.trim();
-    if (!query) return;
-
-    var found = false;
-    var target = null;
-    var targetMarker = null;
-
-    // 사냥터 검색
-    huntingInfo.forEach(info => {
-        if (info.name.includes(query)) {
-            target = info.center; found = true;
-            if (!map.hasLayer(huntingLayers[info.name])) { 
-                map.addLayer(huntingLayers[info.name]); 
-                updateLayerCheckbox(info.name, true); 
-            }
-            setTimeout(() => showHuntingInfo(info), 100);
-        }
-    });
-
-    // 약초 검색
-    if (!found) {
-        herbData.forEach(herb => {
-            if (!found && herb.name.includes(query)) {
-                target = herb.coords; found = true;
-                window.moveAndShowHerb(herb.name, herb.mcX, herb.mcZ, herbColors[herb.name] || '#8e44ad');
-            }
-        });
-    }
-
-    if (found && target) { 
-        map.setView(target, -1); 
-        input.value = ""; 
-    } else { 
-        alert("검색 결과가 없습니다."); 
-    }
-};
-
-// 4. 기타 UI 관리 함수들
-window.updateLayerCheckbox = function(name, isAdd) {
-    document.querySelectorAll('.leaflet-control-layers-overlays label').forEach(label => {
-        if (label.innerText.trim().includes(name)) {
-            var cb = label.querySelector('input');
-            if (cb) cb.checked = isAdd;
-        }
-    });
-};
-
+// 사냥터 목록 생성
 window.generateHuntingList = function() {
     const listElement = document.getElementById('hunting-list');
     huntingInfo.forEach(info => {
@@ -119,13 +44,89 @@ window.generateHuntingList = function() {
     });
 };
 
-window.moveAndShowHunt = function(name) {
-    var info = huntingInfo.find(h => h.name === name);
-    if (!info) return;
-    if (!map.hasLayer(huntingLayers[name])) {
-        map.addLayer(huntingLayers[name]);
-        updateLayerCheckbox(name, true);
+// 레이어 체크박스 동기화
+window.updateLayerCheckbox = function(name, isAdd) {
+    document.querySelectorAll('.leaflet-control-layers-overlays label').forEach(label => {
+        if (label.innerText.trim().includes(name)) {
+            var cb = label.querySelector('input');
+            if (cb) cb.checked = isAdd;
+        }
+    });
+};
+
+// 약초 전용 정보 표시 함수
+window.moveAndShowHerb = function(name, mcX, mcZ, color) {
+    if (!map.hasLayer(herbLayers[name])) { map.addLayer(herbLayers[name]); }
+    var panel = document.getElementById('hunting-info-panel');
+    panel.innerHTML = `<h4 id="panel-name" style="margin: 0;"></h4><div id="panel-lv"></div><div id="herb-detail-content"></div><button onclick="document.getElementById('hunting-info-panel').style.display='none'">닫기</button>`;
+    
+    var allLocations = herbData.filter(h => h.name === name);
+    var coordsHtml = allLocations.map(h => `<div style="margin-bottom:5px;"><span style="background:#444; color:#fff; padding:2px 5px; border-radius:3px; font-size:11px; margin-right:5px;">좌표</span><b style="color:#e74c3c;">X: ${h.mcX} / Z: ${h.mcZ}</b></div>`).join('');
+    var rareHerbs = ["월계엽", "철목영지", "금향과", "빙백설화"];
+    var isRare = rareHerbs.includes(name);
+    var titleExtraHtml = isRare ? ` <span style="color:#e74c3c; font-size:14px;">(희귀)</span>` : "";
+    var descExtraHtml = isRare ? `<div style="font-size:9px; color:#555; margin-top:2px;">희귀 약초는 광범위하게 스폰됩니다.</div>` : `<div style="font-size:9px; color:#e74c3c; margin-top:2px; font-weight:bold;">위 좌표들은 명확하지 않을 수 있습니다.</div>`;
+
+    panel.style.display = 'block';
+    panel.innerHTML = `<div style="border-bottom:3px solid ${color}; padding-bottom:8px; margin-bottom:12px; position:relative;"><b style="font-size:18px; color:#3F3F3F; text-shadow:1px 1px 0px #fff;">${name}</b>${titleExtraHtml}${descExtraHtml}<span style="position:absolute; right:0; top:0; cursor:pointer; font-weight:bold; padding:5px;" onclick="document.getElementById('hunting-info-panel').style.display='none'">X</span></div><div style="font-size:14px; line-height:1.6; background:rgba(255,255,255,0.5); padding:10px; border:1px solid #888; max-height:150px; overflow-y:auto;">${coordsHtml}</div><button onclick="document.getElementById('hunting-info-panel').style.display='none'" style="margin-top:12px; width:100%; cursor:pointer; background:#C6C6C6; border:2px solid #000; box-shadow: inset -2px -2px 0px #555555, inset 2px 2px 0px #ffffff; font-weight:bold; padding:5px;">닫기</button>`;
+};
+
+// 모든 약초 레이어 초기화 함수
+window.resetHerbLayers = function() {
+    Object.keys(herbLayers).forEach(function(name) { if (map.hasLayer(herbLayers[name])) { map.removeLayer(herbLayers[name]); }});
+    document.getElementById('hunting-info-panel').style.display = 'none';
+};
+
+// 검색 실행 함수
+window.executeSearch = function() {
+    var input = document.getElementById('search-input');
+    var query = input.value.trim();
+    if (!query) return;
+    var found = false, target = null, targetMarker = null;
+
+    huntingInfo.forEach(function(info) {
+        if (info.name.includes(query)) {
+            target = info.center; found = true;
+            if (!map.hasLayer(huntingLayers[info.name])) { map.addLayer(huntingLayers[info.name]); updateLayerCheckbox(info.name, true); }
+            setTimeout(() => showHuntingInfo(info), 100);
+        }
+    });
+
+    if (!found) {
+        var exactMatch = poiData.find(p => p.name === query);
+        if (exactMatch) {
+            target = exactMatch.coords; found = true;
+            var key = (exactMatch.type === '스폰') ? '스폰' : (exactMatch.type === '녹') ? '녹색광산' : (exactMatch.type === '청') ? '청색광산' : (exactMatch.type === '황') ? '황색광산' : (exactMatch.type === '적') ? '적색광산' : null;
+            if (key) {
+                if (!map.hasLayer(poiLayers[key])) { map.addLayer(poiLayers[key]); updateLayerCheckbox(key, true); }
+                poiLayers[key].eachLayer(function(l) { if (l instanceof L.Marker && l.getLatLng().equals(target)) targetMarker = l; });
+            }
+        }
     }
-    map.setView(info.center, -1);
-    setTimeout(() => showHuntingInfo(info), 100); 
+
+    if (!found) {
+        herbData.forEach(function(herb) {
+            if (!found && herb.name.includes(query)) {
+                target = herb.coords; found = true;
+                if (!map.hasLayer(herbLayers[herb.name])) { map.addLayer(herbLayers[herb.name]); updateLayerCheckbox(herb.name, true); }
+                herbLayers[herb.name].eachLayer(function(l) { if (l instanceof L.Marker && l.getLatLng().equals(target)) targetMarker = l; });
+            }
+        });
+    }
+
+    if (found && target) { map.setView(target, -1); if (targetMarker) targetMarker.openPopup(); input.value = ""; } 
+    else { alert("검색 결과가 없습니다."); }
+};
+
+window.resetHuntingLayers = function() {
+    Object.keys(huntingLayers).forEach(name => {
+        if (map.hasLayer(huntingLayers[name])) map.removeLayer(huntingLayers[name]);
+        updateLayerCheckbox(name, false);
+    });
+};
+
+window.toggleHuntingList = function() {
+    var content = document.getElementById('hunting-content'), icon = document.getElementById('toggle-icon');
+    if (content.style.display === "none") { content.style.display = "block"; icon.innerText = "▲"; } 
+    else { content.style.display = "none"; icon.innerText = "▼"; }
 };
