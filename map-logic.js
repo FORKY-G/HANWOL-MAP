@@ -2,11 +2,13 @@
 var imgW = 7300, imgH = 6494;
 var imageBounds = [[-imgH, 0], [0, imgW]];
 var map = new L.Map('map', { 
-    maxZoom: 12, minZoom: -2, crs: L.CRS.Simple, noWrap: true, zoomSnap: 0.25 
+    maxZoom: 12, minZoom: -2, crs: L.CRS.Simple, noWrap: true, zoomSnap: 0.1 
+    maxBounds: imageBounds
 });
 
 L.imageOverlay('map.jpg', imageBounds).addTo(map);
 map.fitBounds(imageBounds);
+map.setMinZoom(map.getBoundsZoom(imageBounds));
 
 /** 2. 아이콘 생성 함수 **/
 function createHtmlIcon(color) {
