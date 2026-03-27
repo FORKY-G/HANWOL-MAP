@@ -67,15 +67,21 @@
 
 
 /* 2. 오른쪽 레이어 컨트롤 박스 크기 줄이기 */
-        .leaflet-control-layers-overlays { font-size: 14px; font-weight: bold; }
+       .leaflet-control-layers-overlays { 
+    font-size: 14px; 
+    font-weight: bold; 
+    max-height: 350px; /* 여기서 높이를 제한하여 안쪽 스크롤바만 생기게 합니다 */
+    overflow-y: auto;  /* 스크롤 활성화 */
+    padding-right: 5px; /* 스크롤바와 글자 간격 */
+}
 .leaflet-control-layers {
-    max-height: 400px; /* 최대 높이 제한 */
-    width: 180px;      /* 너비 축소 */
-    overflow-y: auto;  /* 내용이 많으면 스크롤 */
+    width: 180px;      /* 너비 유지 */
     background: #C6C6C6 !important;
     border: 3px solid #000 !important;
     box-shadow: inset -2px -2px 0px #555555, inset 2px 2px 0px #ffffff !important;
     border-radius: 0px !important;
+    padding: 10px;
+}
         .hunt-group-label { color: #e74c3c; border-bottom: 2px solid #e74c3c; display: block; margin-top: 10px; margin-bottom: 5px; }
         .herb-group-label { color: #8e44ad; border-bottom: 2px solid #8e44ad; display: block; margin-top: 10px; margin-bottom: 5px; }
         .mine-group-label { color: #27ae60; border-bottom: 2px solid #27ae60; display: block; margin-top: 10px; margin-bottom: 5px; }
@@ -591,6 +597,13 @@ function createHtmlIcon(color, label) {
                 });
             }
         });
+
+// 좌표 변환 없이 기본 픽셀 좌표만 표시하도록 복구
+        L.control.mousePosition({
+            position: 'bottomleft', 
+            separator: ', ', 
+            prefix: '좌표: '
+        }).addTo(map);
 
     </script>
 </body>
