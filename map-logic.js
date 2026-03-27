@@ -13,7 +13,6 @@ var map = new L.Map('map', {
 });
 
 L.imageOverlay('map.jpg', imageBounds).addTo(map);
-map.setMinZoom(map.getBoundsZoom(imageBounds));
 
 /** 2. 아이콘 생성 함수 **/
 function createHtmlIcon(color) {
