@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <title>한월환해도(0328 업데이트)</title>
+    <title>한월환해도(최종 최적화)</title>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css">
@@ -256,16 +256,26 @@
              .bindTooltip(`<b style="font-size:22px; color:#e67e22;">${z.name}</b><br>MC: ${z.x}, ${z.z}`, { direction: 'top', className: 'custom-tooltip', opacity: 0.95 });
         });
 
-        // 사냥터 (중요: 레이어 추가 시 정보창 연동)
+// 사냥터 (정보창 연동 강화 버전)
         huntingInfo.forEach(info => {
             var imgOverlay = L.imageOverlay(info.file, imageBounds, { opacity: 0.6, interactive: false });
             var clickMarker = L.circleMarker(info.center, { radius: 35, color: '#e74c3c', weight: 1, fillOpacity: 0.1 });
             
-            // 레이어 직접 켜고 끌 때 이벤트
-            imgOverlay.on('add', () => showHuntingInfo(info));
-            imgOverlay.on('remove', () => document.getElementById('hunting-info-panel').style.display='none');
+            // 1. 레이어 자체가 지도에 추가될 때 (오른쪽 메뉴에서 체크할 때)
+            imgOverlay.on('add', function() {
+                showHuntingInfo(info);
+            });
+
+            // 2. 지도 위의 붉은 원(마커)을 클릭했을 때
+            clickMarker.on('click', function() {
+                showHuntingInfo(info);
+            });
             
-            clickMarker.on('click', () => showHuntingInfo(info));
+            // 3. 레이어가 제거될 때 정보창 닫기 (선택 사항)
+            imgOverlay.on('remove', function() {
+                document.getElementById('hunting-info-panel').style.display = 'none';
+            });
+
             huntingLayers[info.name] = L.layerGroup([imgOverlay, clickMarker]);
         });
 
