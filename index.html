@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>한월환해도 (0327 업데이트)</title>
+    <title>한월환해도(0327 업데이트)</title>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css">
@@ -24,7 +24,7 @@
       .info-panel {
         position: absolute;
         top: 50px;
-        left: 100px; /* 레이어 컨트롤러 옆으로 배치 */
+        left: 200px; /* 레이어 컨트롤러 옆으로 배치 */
         z-index: 1000;
         background: rgba(255, 255, 255, 0.95);
         padding: 15px;
@@ -181,10 +181,29 @@
       });
 
       // 약초
+// [수정] 약초 마커에서 외글자(label)를 제거하고 포인트만 남깁니다.
       herbData.forEach(function(herb) {
         if (!herbLayers[herb.name]) herbLayers[herb.name] = L.layerGroup();
-        var hCol = herbColors[herb.name] || '#9b59b6';
-        L.marker(herb.coords, {icon: createHtmlIcon('#8e44ad', herb.label, true)}).addTo(herbLayers[herb.name]).bindPopup(`<b>${herb.name}</b>`);
+        
+        var hCol = herbColors[herb.name] || '#8e44ad';
+        
+        // 아이콘 생성 시 label을 빈 문자열('')로 전달하거나, 
+        // 아예 글자 표시가 없는 기본 마커 스타일을 사용하도록 수정했습니다.
+        L.marker(herb.coords, {
+          icon: L.divIcon({
+            className: 'custom-icon',
+            // 아이콘 내부에 글자(span) 부분을 삭제했습니다.
+            html: `<svg width="42" height="42" viewBox="0 0 24 24">
+                     <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" 
+                           fill="#8e44ad" stroke="white" stroke-width="1"/>
+                   </svg>`,
+            iconSize: [42, 42], 
+            iconAnchor: [21, 42], 
+            popupAnchor: [0, -42]
+          })
+        }).addTo(herbLayers[herb.name]).bindPopup(`<b>${herb.name}</b>`);
+
+        // 주변 범위 표시 원형은 그대로 유지합니다.
         L.circle(herb.coords, { color: hCol, fillColor: hCol, fillOpacity: 0.15, radius: 100 }).addTo(herbLayers[herb.name]);
       });
 
