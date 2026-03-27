@@ -24,10 +24,10 @@ L.imageOverlay('map.jpg', imageBounds).addTo(map);
 map.fitBounds(imageBounds, { padding: [100, 100] });
 
 var initialZoom = map.getZoom();
-map.setZoom(initialZoom - 0.7); // 0.7만큼 더 멀리서 시작합니다.
+map.setZoom(initialZoom - 57); // 0.7만큼 더 멀리서 시작합니다.
 
 // 3. 최소 줌 고정 (사용자가 더 축소하고 싶을 수도 있으니 여유를 둡니다)
-map.setMinZoom(map.getZoom() - 0.5);
+map.setMinZoom(map.getZoom() - 2);
 
 /** 2. 아이콘 생성 함수 **/
 function createHtmlIcon(color) {
