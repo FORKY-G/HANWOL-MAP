@@ -28,8 +28,23 @@ var mountainLayers = L.layerGroup();
 
 // 산(비석)
 mountainData.forEach(m => {
-    L.marker(mcToPx(m.x, m.z), { icon: createSteleIcon() }).addTo(mountainLayers)
-     .bindTooltip(`<b style="font-size:16px;">${m.name}</b><br>X: ${m.x}, Z: ${m.z}`, { direction: 'top', className: 'custom-tooltip' });
+    if (m.type === "statue") {
+        // 동상 마커 생성 (이미지 팝업 포함)
+        L.marker(mcToPx(m.x, m.z), { 
+            icon: L.divIcon({ className: 'statue-icon', iconSize: [30, 30], iconAnchor: [15, 30] }) 
+        }).addTo(mountainLayers)
+        .bindPopup(`
+            <div style="text-align:center;">
+                <b style="font-size:16px;">${m.name}</b><br>
+                <img src="${m.file}" style="width:180px; height:auto; margin-top:10px; border:2px solid #000;"><br>
+                <span style="color:#555; font-size:12px;">X: ${m.x}, Z: ${m.z}</span>
+            </div>
+        `);
+    } else {
+        // 기존 비석 마커 생성
+        L.marker(mcToPx(m.x, m.z), { icon: createSteleIcon() }).addTo(mountainLayers)
+        .bindTooltip(`<b style="font-size:16px;">${m.name}</b><br>X: ${m.x}, Z: ${m.z}`, { direction: 'top', className: 'custom-tooltip' });
+    }
 });
 
 // 광산 및 스폰
