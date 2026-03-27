@@ -452,7 +452,6 @@ window.moveAndShowHunt = function(name) {
         showHuntingInfo(info);
     }
 };
-
         window.toggleHuntingList = function() {
             var content = document.getElementById('hunting-content');
             var icon = document.getElementById('toggle-icon');
@@ -474,16 +473,17 @@ window.resetHuntingLayers = function() {
     document.getElementById('hunting-info-panel').style.display = 'none';
 };
 
-// 모든 약초 레이어 초기화 함수
+// 모든 약초 레이어 초기화 및 체크박스 해제
 window.resetHerbLayers = function() {
     Object.keys(herbLayers).forEach(function(name) {
         if (map.hasLayer(herbLayers[name])) {
             map.removeLayer(herbLayers[name]);
         }
+        // 약초 목록의 체크박스(혹은 선택 상태)도 함께 초기화
+        updateLayerCheckbox(name, false);
     });
     document.getElementById('hunting-info-panel').style.display = 'none';
 };
-
 // 약초 전용 정보 표시 함수 (이동 제거 + 이름 검정 통일 + 희귀/일반 약초 맞춤형 문구 출력)
 window.moveAndShowHerb = function(name, mcX, mcZ, color, coords) {
     // 1. 해당 약초 레이어가 꺼져있다면 켜기
