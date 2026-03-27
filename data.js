@@ -17,7 +17,7 @@ var mountainData = [
     { name: "도덕산", x: 6498, z: 67 }, 
     { name: "삼악산", x: 5917, z: 2453 },
     // 동상 데이터 추가
-    { name: "UNKNOWN", file: "statue3.png", x: 1513, z: 3593, type: "statue" },
+{ name: "UNKNOWN", file: "statue3.png", x: 1513, z: 3593, type: "statue" },
     { name: "UNKNOWN", file: "statue1.png", x: 2903, z: 714, type: "statue" },
     { name: "UNKNOWN", file: "statue2.png", x: -334, z: -5519, type: "statue" }
 ];
@@ -32,7 +32,7 @@ const poiData = [
     { name: "41", type: "적", color: "#e74c3c", coords: mcToPx(1601, 5485), mcX: 1601, mcZ: 5485 }, { name: "42", type: "적", color: "#e74c3c", coords: mcToPx(2129, 6598), mcX: 2129, mcZ: 6598 }, { name: "43", type: "황", color: "#f1c40f", coords: mcToPx(-960, 2033), mcX: -960, mcZ: 2033 }, { name: "44", type: "황", color: "#f1c40f", coords: mcToPx(-2468, 4433), mcX: -2468, mcZ: 4433 }, { name: "45", type: "적", color: "#e74c3c", coords: mcToPx(-5443, 4139), mcX: -5443, mcZ: 4139 }, { name: "46", type: "적", color: "#e74c3c", coords: mcToPx(4024, 3356), mcX: 4024, mcZ: 3356 }, { name: "47", type: "황", color: "#f1c40f", coords: mcToPx(658, 3900), mcX: 658, mcZ: 3900 }, { name: "48", type: "녹", color: "#2ecc71", coords: mcToPx(-2121, -3837), mcX: -2121, mcZ: -3837 }, { name: "49", type: "청", color: "#3498db", coords: mcToPx(4886, 954), mcX: 4886, mcZ: 954 }, { name: "50", type: "청", color: "#3498db", coords: mcToPx(4942, -1189), mcX: 4942, mcZ: -1189 }, 
     { name: "51", type: "황", color: "#f1c40f", coords: mcToPx(677, 1433), mcX: 677, mcZ: 1433 }, { name: "52", type: "녹", color: "#2ecc71", coords: mcToPx(-762, -6601), mcX: -762, mcZ: -6601 }, { name: "53", type: "녹", color: "#2ecc71", coords: mcToPx(2657, -5891), mcX: 2657, mcZ: -5891 }, { name: "54", type: "녹", color: "#2ecc71", coords: mcToPx(2036, -3624), mcX: 2036, mcZ: -3624 }, { name: "55", type: "청", color: "#3498db", coords: mcToPx(-4098, -55), mcX: -4098, mcZ: -55 }, { name: "56", type: "녹", color: "#2ecc71", coords: mcToPx(-2006, 127), mcX: -2006, mcZ: 127 }, { name: "57", type: "녹", color: "#2ecc71", coords: mcToPx(-2264, -1571), mcX: -2264, mcZ: -1571 }, { name: "58", type: "녹", color: "#2ecc71", coords: mcToPx(3885, -1415), mcX: 3885, mcZ: -1415 }, { name: "59", type: "청", color: "#3498db", coords: mcToPx(-5054, -2598), mcX: -5054, mcZ: -2598 }, { name: "60", type: "적", color: "#e74c3c", coords: mcToPx(3323, 3939), mcX: 3323, mcZ: 3939 }, 
     { name: "61", type: "적", color: "#e74c3c", coords: mcToPx(5258, 5723), mcX: 5258, mcZ: 5723 }, { name: "62", type: "녹", color: "#2ecc71", coords: mcToPx(1014, -2648), mcX: 1014, mcZ: -2648 }, { name: "63", type: "황", color: "#f1c40f", coords: mcToPx(2705, 2461), mcX: 2705, mcZ: 2461 }, { name: "64", type: "황", color: "#f1c40f", coords: mcToPx(-4029, 2321), mcX: -4029, mcZ: 2321 }, { name: "65", type: "황", color: "#f1c40f", coords: mcToPx(-790, 4284), mcX: -790, mcZ: 4284 } 
-];
+]; 
 
 /** 4. 약초 데이터 **/
 const herbData = [
