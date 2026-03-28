@@ -166,4 +166,46 @@ window.showMineInfo = function(poi) {
             닫기
         </button>
     `;
+
+    /** 9. 사이트 전체 좌표 클릭 복사 로직 **/
+
+// 1) 실제 복사를 수행하는 함수
+window.copyToClipboard = function(text) {
+    // 좌표 문자열에서 숫자가 아닌 대괄호나 'X:', 'Z:' 같은 문자는 빼고 숫자와 쉼표만 추출해서 깔끔하게 복사
+    var cleanText = text.replace(/[^0-9,\- ]/g, "").trim();
+    
+    navigator.clipboard.writeText(cleanText).then(function() {
+        // 화면 하단에 작게 알림 띄우기 (alert 대신 부드럽게)
+        showCopyToast(cleanText + " 좌표가 복사되었습니다.");
+    });
+};
+
+// 2) 클릭 이벤트 감지 (문서 전체에서 '좌표'라는 글자가 포함된 요소를 클릭하면 실행)
+document.addEventListener('click', function (e) {
+    // 클릭한 요소의 텍스트를 가져옴
+    var targetText = e.target.innerText || "";
+    
+    // 텍스트에 [숫자, 숫자] 형태나 X..., Z... 형태가 있는지 확인
+    var coordPattern = /(-?\d+)\s*,\s*(-?\d+)/; 
+    
+    if (coordPattern.test(targetText)) {
+        var match = targetText.match(coordPattern);
+        if (match) {
+            copyToClipboard(match[0]);
+        }
+    }
+}, true);
+
+// 3) 복사 완료 알림 UI (토스트 메시지)
+function showCopyToast(msg) {
+    var toast = document.createElement("div");
+    toast.innerText = msg;
+    toast.style.cssText = `
+        position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+        background: rgba(0,0,0,0.8); color: #fff; padding: 10px 20px;
+        border-radius: 5px; z-index: 9999; font-size: 14px; pointer-events: none;
+    `;
+    document.body.appendChild(toast);
+    setTimeout(() => { toast.style.opacity = "0"; setTimeout(() => toast.remove(), 500); }, 1500);
+}
 };
