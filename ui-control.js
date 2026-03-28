@@ -281,8 +281,8 @@ window.showRedHwanInfo = function(d) {
         
         <div style="text-align:center; background:#eee; padding:5px; border:1px solid #999;">
             <p style="font-size:11px; color:#666; margin:0 0 5px 0;">이미지 클릭 시 크게 보기</p>
-            <img src="./images/${d.file}" style="width:100%; cursor:pointer; border:1px solid #000;" 
-                 onclick="window.open('./images/${d.file}', '_blank')" 
+            <img src="${d.file}" style="width:100%; cursor:pointer; border:1px solid #000;" 
+                 onclick="window.open('${d.file}', '_blank')" 
                  onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
         </div>
 
