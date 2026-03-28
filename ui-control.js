@@ -194,14 +194,47 @@ window.showMineInfo = function(poi) {
     `;
 };
 
-/** 9. 클립보드 복사 공통 함수 **/
+/** 10. 십이간지 정보창 표시 **/
+window.showZodiacInfo = function(z) {
+    var panel = document.getElementById('hunting-info-panel');
+    
+    panel.style.display = 'block';
+    panel.innerHTML = `
+        <div style="border-bottom:3px solid #e67e22; padding-bottom:8px; margin-bottom:12px;">
+            <b style="font-size:22px; color:#3F3F3F;">${z.name} <span style="font-size:16px; color:#e67e22;">(십이간지)</span></b>
+            
+            <div onclick="copyToClipboard('${z.x}, ${z.z}')" 
+                 title="클릭하여 좌표 복사"
+                 style="font-size:12px; color:#666; margin-top:5px; cursor:pointer; display:inline-block; background:#f0f0f0; padding:2px 6px; border-radius:3px;">
+                 좌표: <span style="text-decoration:underline; font-weight:bold;">${z.x}, ${z.z}</span> 📋
+            </div>
+        </div>
+        
+        <div style="font-size:14px; color:#444; line-height:1.6;">
+            해당 위치는 <b>${z.name}</b>의 기운이 서린 장소입니다.
+        </div>
+        
+        <button onclick="document.getElementById('hunting-info-panel').style.display='none'" 
+                style="margin-top: 15px; cursor: pointer; width: 100%; padding: 8px; background: #C6C6C6; border: 2px solid #000; box-shadow: inset -2px -2px 0px #555555, inset 2px 2px 0px #ffffff; color: #3F3F3F; font-weight: bold;">
+            닫기
+        </button>
+    `;
+}; // 여기서 한 번만 닫아야 합니다.
+
+/** 11. 클립보드 복사 공통 함수 (마무리 필수!) **/
 window.copyToClipboard = function(text) {
     navigator.clipboard.writeText(text).then(function() {
-        // 복사 성공 시 화면 하단에 잠깐 떴다 사라지는 알림(토스트)
+        // 복사 성공 시 화면 하단 알림(토스트)
         var toast = document.createElement("div");
         toast.innerText = "좌표가 복사되었습니다: " + text;
         toast.style.cssText = "position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.8); color:#fff; padding:10px 20px; border-radius:5px; z-index:9999; font-size:14px;";
         document.body.appendChild(toast);
-        setTimeout(() => { toast.style.opacity="0"; setTimeout(()=>toast.remove(), 500); }, 1000);
+        setTimeout(() => { 
+            toast.style.opacity = "0"; 
+            toast.style.transition = "opacity 0.5s";
+            setTimeout(() => toast.remove(), 500); 
+        }, 1000);
+    }).catch(function(err) {
+        console.error('복사 실패:', err);
     });
 };
