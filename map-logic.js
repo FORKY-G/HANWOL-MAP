@@ -43,6 +43,49 @@ var mountainLayers = L.layerGroup();
 
 /** 4. 레이어 초기화 로직 (마커 생성 등) **/
 
+// --- [추가 시작] 모든 경로 선을 담을 전역 객체 ---
+var routeLines = {};
+
+// order가 있는 광산만 골라내고 순서대로 정렬합니다.
+const sortedMines = poiData
+    .filter(p => p.order !== undefined)
+    .sort((a, b) => a.order - b.order);
+
+// 정렬된 광산들을 돌면서 선을 미리 만듭니다.
+sortedMines.forEach((mine, index) => {
+    if (index === sortedMines.length - 1) return; // 마지막은 다음이 없음
+    var nextMine = sortedMines[index + 1];
+
+    var lineStyle = {
+        color: '#ff6b6b', // 선 색상
+        weight: 3,
+        opacity: 0,       // 처음엔 숨김
+        dashArray: nextMine.lineType === "dotted" ? "5, 10" : null // T지점이면 점선
+    };
+
+    var line = L.polyline([mine.coords, nextMine.coords], lineStyle).addTo(map);
+    var lineId = mine.name + '-' + nextMine.name;
+    routeLines[lineId] = line;
+});
+
+// 호버 이벤트 함수 정의
+function addRouteHoverEvent(marker, mineName) {
+    marker.on('mouseover', function () {
+        for (var lineId in routeLines) {
+            if (lineId.startsWith(mineName + '-') || lineId.endsWith('-' + mineName)) {
+                routeLines[lineId].setStyle({ opacity: 1 });
+            }
+        }
+    });
+    marker.on('mouseout', function () {
+        for (var lineId in routeLines) {
+            if (lineId.startsWith(mineName + '-') || lineId.endsWith('-' + mineName)) {
+                routeLines[lineId].setStyle({ opacity: 0 });
+            }
+        }
+    });
+}
+
 /** 5. 산(비석) & 동상 레이어 생성 로직 **/
 mountainData.forEach(m => {
     // [핵심 수정] 데이터에 직접 입력한 coords가 있으면 그걸 쓰고, 없으면 mcToPx로 계산합니다.
@@ -73,7 +116,9 @@ poiData.forEach(poi => {
     
     if(key) {
         var marker = L.marker(poi.coords, {icon: createHtmlIcon(poi.color)}).addTo(poiLayers[key]);
-        
+        if (poi.order !== undefined) {
+            addRouteHoverEvent(marker, poi.name);
+        }
         if (poi.type === '스폰') {
             marker.bindPopup(`<b>스폰 지점</b><br>[ ${poi.mcX}, ${poi.mcZ} ]`);
         } else {
