@@ -155,3 +155,18 @@ var redHwanData = [
     { name: "6. 적환단", x: -2579, y: 87, z: -5970, file: "red6.png" },
     { name: "7. 적환단", x: -3375, y: 100, z: 3449, file: "red7.png" }
 ];
+
+/** 10. NPC 데이터 **/
+var npcData = [
+    { name: "해진", x: -4311, z: 5831, relation: "해적선퀘스트", file: "haejin.png" },
+    { name: "점소이", x: -2538, z: -5994, relation: "", file: "jumsoi.png" },
+    { name: "주루대주", x: -2545, z: -6020, relation: "", file: "juru.png" },
+    { name: "자운스님", x: -4366, z: 1394, relation: "해무사퀘스트", file: "jaun.png" },
+    { name: "풍잔객", x: 3039, z: 4235, relation: "사도연퀘스트", file: "pung.png" },
+    { name: "기록서", x: 1539, z: 4654, relation: "사도연퀘스트", file: "memo.png" },
+    { name: "시녀", x: -6535, z: -2577, relation: "해무사퀘스트", file: "girl.png" },
+    { name: "도공", x: -4786, z: 1442, relation: "", file: "dogong.png" },
+    { name: "도사", x: -1290, z: -591, relation: "", file: "dosa.png" },
+    { name: "명인대장장이", x: -7051, z: -727, relation: "", file: "mungin.png" },
+    { name: "망한대장장이", x: 5369, z: -3462, relation: "", file: "mang.png" }
+];
