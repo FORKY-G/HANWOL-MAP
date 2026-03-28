@@ -68,9 +68,11 @@ sortedMines.forEach((mine, index) => {
 
     var line = L.polyline([mine.coords, nextMine.coords], lineStyle).addTo(map);
 
-    // [중요] 현재 광산의 타입(녹, 청, 황, 적) 그룹에 이 선을 저장합니다.
-    if (routeLinesByGroup[mine.type]) {
+   if (routeLinesByGroup[mine.type]) {
         routeLinesByGroup[mine.type].push(line);
+    }
+    if (nextMine.type !== mine.type && routeLinesByGroup[nextMine.type]) {
+        routeLinesByGroup[nextMine.type].push(line);
     }
 });
 
