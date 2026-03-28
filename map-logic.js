@@ -128,30 +128,17 @@ poiData.forEach(poi => {
     
     if(key) {
         var marker = L.marker(poi.coords, {icon: createHtmlIcon(poi.color)}).addTo(poiLayers[key]);
-        
-        if (poi.order !== undefined) {
+      if (poi.order !== undefined) {
             addGroupRouteHover(marker, poi.type); 
         }
-
         if (poi.type === '스폰') {
             marker.bindPopup(`<b>스폰 지점</b><br>[ ${poi.mcX}, ${poi.mcZ} ]`);
         } else {
-            // 광산 클릭 시 상세 정보창 출력 (원래 쓰던 방식)
+            // 광산 클릭 시 상세 정보창 함수 호출 (원래 상태)
             marker.on('click', function() {
-                var panel = document.getElementById('mine-info-panel');
-                if (!panel) return;
-
-                // 원래 출력되던 기본 정보들
-                panel.innerHTML = `
-                    <div style="padding:10px;">
-                        <h3 style="color: ${poi.color}; margin:0 0 10px 0;">${poi.name}번 광산</h3>
-                        <p><b>좌표:</b> [ ${poi.mcX}, ${poi.mcZ} ]</p>
-                    </div>
-                `;
-                panel.style.display = 'block';
+                showMineInfo(poi);
             });
-
-            // 마우스 올렸을 때 번호 툴팁
+            // 마우스 올렸을 때 번호만 살짝 보이게 툴팁 추가
             marker.bindTooltip(`${poi.name}번 광산`, { direction: 'top', offset: [0, -10] });
         }
     }
