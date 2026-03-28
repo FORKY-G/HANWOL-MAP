@@ -128,49 +128,17 @@ poiData.forEach(poi => {
     
     if(key) {
         var marker = L.marker(poi.coords, {icon: createHtmlIcon(poi.color)}).addTo(poiLayers[key]);
-        
-        if (poi.order !== undefined) {
+      if (poi.order !== undefined) {
             addGroupRouteHover(marker, poi.type); 
         }
-
         if (poi.type === '스폰') {
             marker.bindPopup(`<b>스폰 지점</b><br>[ ${poi.mcX}, ${poi.mcZ} ]`);
         } else {
-            // 광산 클릭 시 정보창 띄우기 (익명 함수 방식)
+            // 광산 클릭 시 상세 정보창 함수 호출 (원래 상태)
             marker.on('click', function() {
-                var panel = document.getElementById('mine-info-panel');
-                if (!panel) return;
-
-                // data.js에서 데이터 가져오기
-                const detail = mineDetailInfo[poi.type] || { title: poi.type, unique: "-", route: "-", desc: "" };
-                const common = mineDetailInfo["공통"] || "";
-
-                // 네 사이트의 닫기 버튼과 스타일을 그대로 적용
-                panel.innerHTML = `
-                    <div class="mine-info-content" style="position:relative; padding:15px; color:#fff;">
-                        <button class="close-btn" onclick="document.getElementById('mine-info-panel').style.display='none'" 
-                                style="position:absolute; right:10px; top:10px; background:none; border:none; color:#fff; font-size:20px; cursor:pointer;">×</button>
-                        
-                        <h3 style="color: ${poi.color}; margin:0 0 10px 0;">${poi.name}번 광산 (${detail.title})</h3>
-                        <p style="margin:5px 0;"><b>좌표:</b> [ ${poi.mcX}, ${poi.mcZ} ]</p>
-                        <p style="margin:5px 0;"><b>고유광물:</b> ${detail.unique}</p>
-                        <p style="margin:5px 0;"><b>공통광물:</b> ${common}</p>
-                        
-                        <hr style="border:0; border-top:1px solid #444; margin:15px 0;">
-
-                        <div style="font-size: 15px; font-weight: bold; color: #eee; word-break: break-all; line-height: 1.4;">
-                            ${detail.route}
-                        </div>
-                        
-                        <div style="font-size: 12px; color: #aaa; margin-top: 8px; line-height: 1.5;">
-                            ${detail.desc}
-                        </div>
-                    </div>
-                `;
-                panel.style.display = 'block';
+                showMineInfo(poi);
             });
-
-            // 마우스 올렸을 때 번호 툴팁
+            // 마우스 올렸을 때 번호만 살짝 보이게 툴팁 추가
             marker.bindTooltip(`${poi.name}번 광산`, { direction: 'top', offset: [0, -10] });
         }
     }
