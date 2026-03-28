@@ -76,19 +76,22 @@ sortedMines.forEach((mine, index) => {
     }
 });
 
-// [2] 그룹 호버 이벤트 함수
+// [2] 그룹 호버 이벤트 함수 - 이 함수가 정확히 이 모양인지 확인하세요!
 function addGroupRouteHover(marker, groupType) {
     marker.on('mouseover', function () {
-        // 해당 그룹(예: "녹")에 속한 모든 선을 보여줍니다.
+        console.log(groupType + " 그룹 동선 표시"); // 브라우저 콘솔에서 확인용
         if (routeLinesByGroup[groupType]) {
-            routeLinesByGroup[groupType].forEach(line => line.setStyle({ opacity: 1 }));
+            routeLinesByGroup[groupType].forEach(line => {
+                line.setStyle({ opacity: 1, color: '#ff4757', weight: 4 }); // 더 잘 보이게 색상/두께 강조
+            });
         }
     });
 
     marker.on('mouseout', function () {
-        // 해당 그룹의 모든 선을 다시 숨깁니다.
         if (routeLinesByGroup[groupType]) {
-            routeLinesByGroup[groupType].forEach(line => line.setStyle({ opacity: 0 }));
+            routeLinesByGroup[groupType].forEach(line => {
+                line.setStyle({ opacity: 0 }); 
+            });
         }
     });
 }
