@@ -98,84 +98,74 @@ window.resetHerbLayers = function() {
     document.getElementById('hunting-info-panel').style.display = 'none';
 };
 
-// 검색 실행 함수
-
+/** 통합 검색 기능 (정보창 호출 강화) **/
 window.executeSearch = function() {
-
     var input = document.getElementById('search-input');
-
-    var query = input.value.trim();
-
+    var query = input.value.trim().toLowerCase();
     if (!query) return;
 
-    var found = false, target = null, targetMarker = null;
+    var allTargets = [];
+    
+    // 데이터 합치기 (각 데이터의 성격을 식별할 수 있는 플래그 추가)
+    if (typeof huntingInfo !== 'undefined') allTargets = allTargets.concat(huntingInfo.map(d => ({...d, _category: 'hunting'})));
+    if (typeof poiData !== 'undefined') allTargets = allTargets.concat(poiData.map(d => ({...d, _category: 'poi'})));
+    if (typeof herbData !== 'undefined') allTargets = allTargets.concat(herbData.map(d => ({...d, _category: 'herb'})));
+    if (typeof npcData !== 'undefined') allTargets = allTargets.concat(npcData.map(d => ({...d, _category: 'npc'})));
+    if (typeof redHwanData !== 'undefined') allTargets = allTargets.concat(redHwanData.map(d => ({...d, _category: 'redhwan'})));
+    if (typeof discoveryData !== 'undefined') allTargets = allTargets.concat(discoveryData.map(d => ({...d, _category: 'discovery'})));
+    if (typeof mountainData !== 'undefined') allTargets = allTargets.concat(mountainData.map(d => ({...d, _category: 'mountain'})));
+    if (typeof zodiacData !== 'undefined') allTargets = allTargets.concat(zodiacData.map(d => ({...d, _category: 'zodiac'})));
 
+    // 1단계: 완전 일치 검색 (숫자 1, 11 문제 해결)
+    var result = allTargets.find(d => d.name && d.name.toString().toLowerCase() === query);
 
-
-    huntingInfo.forEach(function(info) {
-
-        if (info.name.includes(query)) {
-
-            target = info.center; found = true;
-
-            if (!map.hasLayer(huntingLayers[info.name])) { map.addLayer(huntingLayers[info.name]); updateLayerCheckbox(info.name, true); }
-
-            setTimeout(() => showHuntingInfo(info), 100);
-
-        }
-
-    });
-
-
-
-    if (!found) {
-
-        var exactMatch = poiData.find(p => p.name === query);
-
-        if (exactMatch) {
-
-            target = exactMatch.coords; found = true;
-
-            var key = (exactMatch.type === '스폰') ? '스폰' : (exactMatch.type === '녹') ? '녹색광산' : (exactMatch.type === '청') ? '청색광산' : (exactMatch.type === '황') ? '황색광산' : (exactMatch.type === '적') ? '적색광산' : null;
-
-            if (key) {
-
-                if (!map.hasLayer(poiLayers[key])) { map.addLayer(poiLayers[key]); updateLayerCheckbox(key, true); }
-
-                poiLayers[key].eachLayer(function(l) { if (l instanceof L.Marker && l.getLatLng().equals(target)) targetMarker = l; });
-
-            }
-
-        }
-
+    // 2단계: 부분 일치 검색
+    if (!result) {
+        result = allTargets.find(d => 
+            (d.name && d.name.toString().toLowerCase().includes(query)) || 
+            (d.item && d.item.toLowerCase().includes(query)) ||
+            (d.relation && d.relation.toLowerCase().includes(query))
+        );
     }
 
+    if (result) {
+        var pos = result.coords ? result.coords : mcToPx(result.x, result.z);
+        map.setView(pos, 2); 
 
+        // --- 정보창 강제 호출 로직 ---
+        // 1. NPC (파일이 있고 relation이 있거나 category가 npc인 경우)
+        if (result._category === 'npc' || result.relation) {
+            showNPCInfo(result);
+        } 
+        // 2. 적환단 (이름에 적환단이 포함되거나 category가 redhwan인 경우)
+        else if (result._category === 'redhwan' || (result.name && result.name.includes("적환단"))) {
+            showRedHwanInfo(result);
+        }
+        // 3. 광산/스폰
+        else if (result._category === 'poi') {
+            showMineInfo(result);
+        }
+        // 4. 사냥터/비석
+        else if (result._category === 'hunting' || result._category === 'mountain') {
+            showHuntingInfo(result);
+        }
+        // 5. 탐색(항아리)
+        else if (result._category === 'discovery') {
+            showDiscoveryInfo(result);
+        }
+        // 6. 십이간지
+        else if (result._category === 'zodiac') {
+            showZodiacInfo(result);
+        }
+        // 7. 기타 (약초 등)
+        else {
+            L.popup().setLatLng(pos).setContent(`<b>${result.name}</b>`).openOn(map);
+        }
 
-    if (!found) {
-
-        herbData.forEach(function(herb) {
-
-            if (!found && herb.name.includes(query)) {
-
-                target = herb.coords; found = true;
-
-                if (!map.hasLayer(herbLayers[herb.name])) { map.addLayer(herbLayers[herb.name]); updateLayerCheckbox(herb.name, true); }
-
-                herbLayers[herb.name].eachLayer(function(l) { if (l instanceof L.Marker && l.getLatLng().equals(target)) targetMarker = l; });
-
-            }
-
-        });
-
+        input.value = ""; 
+    } else {
+        alert("검색 결과가 없습니다: " + query);
     }
-
-
-
-    if (found && target) { map.setView(target, -1); if (targetMarker) targetMarker.openPopup(); input.value = ""; } 
-
-    else { alert("검색 결과가 없습니다."); }
-
 };
 
 
