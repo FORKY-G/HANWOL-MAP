@@ -45,7 +45,7 @@ var mountainLayers = L.layerGroup();
 
 /** 7. 광산 동선 생성 및 그룹 호버 이벤트 **/
 
-// 모든 경로 선을 그룹별로 담을 객체 (예: { "녹": [line1, line2...], "청": [...] })
+// 모든 경로 선을 그룹별로 담을 객체
 var routeLinesByGroup = { "녹": [], "청": [], "황": [], "적": [] };
 
 // [1] 데이터 정리 및 선 생성
@@ -57,37 +57,45 @@ sortedMines.forEach((mine, index) => {
     if (index === sortedMines.length - 1) return;
     var nextMine = sortedMines[index + 1];
 
-    // 같은 그룹(색상)일 때만 선을 긋고 싶다면 아래 조건을 유지, 
-    // 만약 그룹 상관없이 전체를 잇는 거라면 mine.type을 쓰시면 됩니다.
-    var lineStyle = {
+    var dashValue = (nextMine.lineType === "dotted") ? "5, 10" : null;
+    
+   var lineStyle = {
         color: '#ff6b6b', 
         weight: 3,
-        opacity: 0, // 숨김
-        dashArray: nextMine.lineType === "dotted" ? "5, 10" : null
+        opacity: 0, 
+        dashArray: dashValue, // 점선 값 적용
+        lineJoin: 'round',    // 선 꺾임 부드럽게
+        interactive: false
     };
 
-    var line = L.polyline([mine.coords, nextMine.coords], lineStyle).addTo(map);
+  var line = L.polyline([mine.coords, nextMine.coords], lineStyle).addTo(map);
 
-   if (routeLinesByGroup[mine.type]) {
+    // [핵심] 출발지(mine) 그룹에 이 선을 저장
+    if (routeLinesByGroup[mine.type]) {
         routeLinesByGroup[mine.type].push(line);
     }
-    if (nextMine.type !== mine.type && routeLinesByGroup[nextMine.type]) {
-        routeLinesByGroup[nextMine.type].push(line);
+    
+    // [핵심] 도착지(nextMine) 그룹에도 이 선을 저장 (중복 방지 체크)
+    if (routeLinesByGroup[nextMine.type]) {
+        if (!routeLinesByGroup[nextMine.type].includes(line)) {
+            routeLinesByGroup[nextMine.type].push(line);
+        }
     }
 });
 
-// [2] 그룹 호버 이벤트 함수 - 이 함수가 정확히 이 모양인지 확인하세요!
+// [2] 그룹 호버 이벤트 함수
 function addGroupRouteHover(marker, groupType) {
     marker.on('mouseover', function () {
-        console.log(groupType + " 그룹 동선 표시"); // 브라우저 콘솔에서 확인용
+        // 해당 그룹(예: "녹")에 저장된 모든 선을 한꺼번에 보여줍니다.
         if (routeLinesByGroup[groupType]) {
             routeLinesByGroup[groupType].forEach(line => {
-                line.setStyle({ opacity: 1, color: '#ff4757', weight: 4 }); // 더 잘 보이게 색상/두께 강조
+                line.setStyle({ opacity: 1, color: '#ff4757', weight: 4 });
             });
         }
     });
 
     marker.on('mouseout', function () {
+        // 다시 모든 선 숨김
         if (routeLinesByGroup[groupType]) {
             routeLinesByGroup[groupType].forEach(line => {
                 line.setStyle({ opacity: 0 }); 
