@@ -255,6 +255,7 @@ redHwanData.forEach(d => {
 var menuOrder = {
     "스폰": poiLayers['스폰'], "십이간지": poiLayers['십이간지'],
     "<span class='divider-line'></span>": L.layerGroup(),
+    "👤 NPC": npcLayers,
     "⛰️ 산(비석)": mountainLayers,
     "🔴 적환단": redHwanLayers,
     "🔍 탐색": discoveryLayers,
