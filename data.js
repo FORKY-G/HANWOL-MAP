@@ -144,3 +144,14 @@ var discoveryData = [
     { name: "항아리", x: 6426, y: 112, z: 2392, item: "연마사", tool: "탐령구" },
     { name: "항아리", x: 4171, y: 74, z: 2643, item: "마모된인장", tool: "탐령구" }
 ];
+
+/** 9. 적환단 데이터 **/
+var redHwanData = [
+    { name: "1. 적환단", x: -3656, y: 78, z: 4060, file: "red1.png" },
+    { name: "2. 적환단", x: -1458, y: 94, z: 2875, file: "red2.png" },
+    { name: "3. 적환단", x: 2358, y: 100, z: 2177, file: "red3.png" },
+    { name: "4. 적환단", x: 2661, y: 72, z: -4790, file: "red4.png" },
+    { name: "5. 적환단", x: 1961, y: 150, z: -6200, file: "red5.png" },
+    { name: "6. 적환단", x: -2579, y: 87, z: -5970, file: "red6.png" },
+    { name: "7. 적환단", x: -3375, y: 100, z: 3449, file: "red7.png" }
+];
