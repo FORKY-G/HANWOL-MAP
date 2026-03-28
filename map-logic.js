@@ -252,6 +252,20 @@ redHwanData.forEach(d => {
     marker.on('click', () => showRedHwanInfo(d));
 });
 
+// NPC 마커 생성 (discoveryData 로직 아래에 추가)
+npcData.forEach(d => {
+    var marker = L.marker(mcToPx(d.x, d.z), {
+        icon: L.icon({
+            iconUrl: d.file, 
+            iconSize: [32, 32],
+            iconAnchor: [16, 16]
+        })
+    }).addTo(npcLayers);
+
+    marker.bindTooltip(`<b>${d.name}</b>`, { direction: 'top', offset: [0, -10] });
+    marker.on('click', () => showNPCInfo(d));
+});
+
 /** 5. 메뉴 UI 구성 **/
 var menuOrder = {
     "스폰": poiLayers['스폰'], "십이간지": poiLayers['십이간지'],
