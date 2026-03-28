@@ -42,6 +42,7 @@ var huntingLayers = {};
 var mountainLayers = L.layerGroup();
 var discoveryLayers = L.layerGroup(); // 탐색 레이어 추가
 var redHwanLayers = L.layerGroup();
+var npcLayers = L.layerGroup();
 
 /** 4. 레이어 초기화 로직 (마커 생성 등) **/
 
