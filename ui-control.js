@@ -221,7 +221,7 @@ window.showZodiacInfo = function(z) {
     `;
 }; // 여기서 한 번만 닫아야 합니다.
 
-/** 11. 클립보드 복사 공통 함수 (마무리 필수!) **/
+/** 11. 클립보드 복사 공통 함수 **/
 window.copyToClipboard = function(text) {
     navigator.clipboard.writeText(text).then(function() {
         // 복사 성공 시 화면 하단 알림(토스트)
@@ -237,7 +237,8 @@ window.copyToClipboard = function(text) {
     }).catch(function(err) {
         console.error('복사 실패:', err);
     });
-    
+}; // <--- 여기서 copyToClipboard 함수가 끝납니다.
+
 /** 12. 탐색(항아리) 정보창 표시 **/
 window.showDiscoveryInfo = function(d) {
     var panel = document.getElementById('hunting-info-panel');
@@ -262,6 +263,4 @@ window.showDiscoveryInfo = function(d) {
             닫기
         </button>
     `;
-};
-    
-};
+}; //
