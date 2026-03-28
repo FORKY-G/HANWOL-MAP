@@ -109,19 +109,28 @@ mountainData.forEach(m => {
             icon: L.divIcon({ className: 'statue-icon', iconSize: [30, 30], iconAnchor: [15, 30] }) 
         }).addTo(mountainLayers);
 
-        // 툴팁에 이름과 좌표 추가
-        marker.bindTooltip(`<b>${m.name}</b><br><span style="font-size:11px; color:#ccc;">[${m.x}, ${m.z}]</span>`, { direction: 'top' });
+        // [복구] 원래 있던 이미지 팝업 코드를 그대로 유지합니다!
+        marker.bindPopup(`
+            <div style="text-align:center;">
+                <b style="font-size:14px;">${m.name}</b><br>
+                <img src="${m.file}" style="width:150px; height:auto; border:2px solid #000; margin-top:5px;"><br>
+                <span style="font-size:11px; color:#666;">[${m.x}, ${m.z}]</span>
+            </div>
+        `);
 
-        // 클릭 시 기존 팝업 대신 ui-control.js의 정보창 호출 (좌표 복사 기능 포함)
-        marker.on('click', function() {
-            showHuntingInfo(m); 
-        });
-        
+        // [추가] 마우스 올렸을 때(툴팁) 이름과 좌표가 함께 나오도록 설정
+        marker.bindTooltip(`
+            <div style="text-align:center;">
+                <b style="font-size:14px; color:#2c3e50;">${m.name}</b><br>
+                <span style="font-size:12px; color:#666;">[ ${m.x}, ${m.z} ]</span>
+            </div>
+        `, { direction: 'top', offset: [0, -10] });
+
     } else {
         // --- 일반 비석일 경우 ---
         var marker = L.marker(finalPos, { icon: createSteleIcon() }).addTo(mountainLayers);
 
-        // [수정] 툴팁에 이름과 좌표가 함께 나오도록 설정
+        // [추가] 마우스 올렸을 때(툴팁) 이름과 좌표가 함께 나오도록 설정
         marker.bindTooltip(`
             <div style="text-align:center;">
                 <b style="font-size:14px; color:#2c3e50;">${m.name}</b><br>
@@ -133,7 +142,7 @@ mountainData.forEach(m => {
             className: 'custom-tooltip' 
         });
 
-        // [추가] 클릭 시 ui-control.js의 정보창 호출
+        // 클릭 시 ui-control.js의 정보창 호출 (좌표 복사 기능 포함)
         marker.on('click', function() {
             showHuntingInfo(m); 
         });
