@@ -43,6 +43,7 @@ var mountainLayers = L.layerGroup();
 var discoveryLayers = L.layerGroup(); // 탐색 레이어 추가
 var redHwanLayers = L.layerGroup();
 var npcLayers = L.layerGroup();
+var mysteryBoxLayers = L.layerGroup();
 
 /** 4. 레이어 초기화 로직 (마커 생성 등) **/
 
@@ -238,6 +239,24 @@ discoveryData.forEach(d => {
     });
 });
 
+// 의문의 상자
+mysteryBoxData.forEach(d => {
+    var marker = L.marker(mcToPx(d.x, d.z), {
+        icon: L.icon({
+            iconUrl: 'box.png', // 요청하신 파일명
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        })
+    }).addTo(mysteryBoxLayers);
+
+    marker.bindTooltip(`<b>${d.name}</b>`, { direction: 'top', offset: [0, -10] });
+    
+    // 클릭 시 상세 정보(좌표 등)를 띄우고 싶다면 아래 함수 연결
+    marker.on('click', function() {
+        showDiscoveryInfo(d); // 항아리와 동일한 정보창 형식을 사용하거나 새로 만드셔도 됩니다.
+    });
+});
+
 // 적환단 마커 생성
 redHwanData.forEach(d => {
     var marker = L.marker(mcToPx(d.x, d.z), {
@@ -274,6 +293,7 @@ var menuOrder = {
     "⛰️ 산(비석)": mountainLayers,
     "🔴 적환단": redHwanLayers,
     "🔍 탐색": discoveryLayers,
+    "📦 의문의상자" : mysteryBoxLayers,
     "<span class='divider-line'></span> ": L.layerGroup(),
     "<span class='mine-group-label'>💎 광산 구역</span>": L.layerGroup(),
     "<span style='color: #2ecc71;'>녹색광산</span>": poiLayers['녹색광산'],
