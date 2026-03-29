@@ -45,9 +45,7 @@ var redHwanLayers = L.layerGroup();
 var npcLayers = L.layerGroup();
 var mysteryBoxLayers = L.layerGroup();
 
-/** 4. 레이어 초기화 로직 (마커 생성 등) **/
-
-/** 7. 광산 동선 생성 및 그룹 호버 이벤트 **/
+/** 광산 동선 생성 및 그룹 호버 이벤트 **/
 
 var routeLinesByGroup = { "녹": [], "청": [], "황": [], "적": [] };
 
@@ -284,6 +282,30 @@ npcData.forEach(d => {
     marker.bindTooltip(`<b>${d.name}</b>`, { direction: 'top', offset: [0, -10] });
     marker.on('click', () => showNPCInfo(d));
 });
+
+/** 11. 히든퀘스트 동선 설정 (NPC 로직 아래에 추가) **/
+var questLayers = L.layerGroup(); // 레이어 생성
+
+// 상단주 -> 부숴진마차 -> 자운스님 순서로 데이터 찾기
+var questPathData = [
+    npcData.find(n => n.name.includes("상단주")),
+    npcData.find(n => n.name.includes("부숴진마차")),
+    npcData.find(n => n.name.includes("자운스님"))
+].filter(p => p !== undefined); // 데이터가 없을 경우를 대비한 방어 코드
+
+if (questPathData.length >= 2) {
+    var questLatLngs = questPathData.map(p => mcToPx(p.x, p.z));
+
+    var questLine = L.polyline(questLatLngs, {
+        color: '#a29bfe',      // 빨간색
+        weight: 3,             // 두께
+        opacity: 0.8,          // 투명도
+        dashArray: '10, 10',   // 점선
+        lineJoin: 'round'
+    }).addTo(questLayers);
+
+    questLine.bindTooltip("<b>상단주 히든퀘스트 동선</b>", { sticky: true });
+}
 
 /** 5. 메뉴 UI 구성 **/
 var menuOrder = {
