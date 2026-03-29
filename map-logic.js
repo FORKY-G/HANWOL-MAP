@@ -271,38 +271,40 @@ redHwanData.forEach(d => {
     marker.on('click', () => showRedHwanInfo(d));
 });
 
-/** 11. 히든퀘스트 동선 설정 (보라색) **/
+/** 11. 히든퀘스트 동선 설정 (진한 보라색) **/
 var questLayers = L.layerGroup(); 
 
-// 데이터 추출
+// [수정] 웹 시작하자마자 지도에 표시되도록 설정
+questLayers.addTo(map); 
+
 var questPathData = [
-    npcData.find(n => n.name.includes("상단주")),
-    npcData.find(n => n.name.includes("부숴진마차")),
-    npcData.find(n => n.name.includes("자운스님"))
+    npcData.find(n => n && n.name && n.name.includes("상단주")),
+    npcData.find(n => n && n.name && n.name.includes("부숴진마차")),
+    npcData.find(n => n && n.name && n.name.includes("자운스님"))
 ].filter(p => p !== undefined);
 
-var questLine; // 전역 변수처럼 선언
+var questLine;
 
 if (questPathData.length >= 2) {
     var questLatLngs = questPathData.map(p => mcToPx(p.x, p.z));
 
     questLine = L.polyline(questLatLngs, {
-        color: '#6c5ce7',      // 보라색
-        weight: 4,
-        opacity: 0,            // 처음엔 투명하게
-        dashArray: '10, 10',   
+        color: '#6c5ce7',      // 진한 보라색
+        weight: 6,             // 두께를 4 -> 6으로 키워서 더 진하게!
+        opacity: 0,            // 처음엔 투명 (호버 시 나타남)
+        dashArray: '12, 12',   // 점선 간격 조절
         lineJoin: 'round',
         interactive: false
     }).addTo(questLayers);
 }
 
-// 호버 이벤트 함수 정의
+// 호버 시 선을 아주 진하게(0.9) 만드는 함수
 function addQuestRouteHover(marker) {
     marker.on('mouseover', function () {
-        if(questLine) questLine.setStyle({ opacity: 1 });
+        if(questLine) questLine.setStyle({ opacity: 0.9 }); // 0.9 정도로 아주 진하게 표시
     });
     marker.on('mouseout', function () {
-        if(questLine) questLine.setStyle({ opacity: 0 });
+        if(questLine) questLine.setStyle({ opacity: 0 }); 
     });
 }
 
