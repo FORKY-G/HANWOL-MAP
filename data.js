@@ -176,7 +176,7 @@ var npcData = [
     { name: "망한대장장이", x: 5369, z: -3462, relation: "", file: "mang.png" },
     { name: "심마니(lv.90)", x: -3485, z: -1949, relation: "", file: "simmani.png" },
     { name: "감시관(lv.67)", x: 5176, z: 4585, relation: "필요아이템<br>*사보도1개,철3개,무공정수10개</br>", file: "gamsi.png" },
-    { name: "척후병", x: -3963, z: 2612, relation: "", file: "scout.png" },
+    { name: "척후병(lv.100)", x: -3963, z: 2612, relation: "", file: "scout.png" },
     { name: "상단주(lv.50)", x: -3260, z: -4290, relation: "<span style='color:#a29bfe;'>*상단주 히든퀘스트2</span><br>보상 금환단1개</br>", file: "owner.png" },
     { name: "부숴진마차(lv.50)", x: -2706, z: -2372, relation: "<span style='color:#ff4757;'><span style='color:#a29bfe;'>*상단주 히든퀘스트2</span>", file: "macha.png" },
     { name: "탐령구제작", x: -2076, z: 425, relation: "철1개, 적동괴2개", file: "gu.png" },
@@ -189,5 +189,6 @@ var mysteryBoxData = [
     { name: "의문의 상자", x: 3068, y: 172, z: 6312 },
     { name: "의문의 상자", x: 5107, y: 266, z: -1998 },
     { name: "의문의 상자", x: 2985, y: 179, z: -980 },
-    { name: "의문의 상자", x: -1420, y: 128, z: -4655 }
+    { name: "의문의 상자", x: -1420, y: 128, z: -4655 },
+    { name: "의문의 상자", x: -3979, y: 80, z: 2501 }
 ];
