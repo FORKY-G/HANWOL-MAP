@@ -306,7 +306,7 @@ function addQuestRouteHover(marker) {
     });
 }
 
-// NPC 마커 생성 (discoveryData 로직 아래에 추가)
+// NPC 마커 생성 (수정 버전)
 npcData.forEach(d => {
     var marker = L.marker(mcToPx(d.x, d.z), {
         icon: L.icon({
@@ -315,6 +315,11 @@ npcData.forEach(d => {
             iconAnchor: [16, 16]
         })
     }).addTo(npcLayers);
+
+    // [추가] 상단주, 마차, 자운스님일 경우에만 호버 이벤트 연결
+    if (d.name.includes("상단주") || d.name.includes("부숴진마차") || d.name.includes("자운스님")) {
+        addQuestRouteHover(marker);
+    }
 
     marker.bindTooltip(`<b>${d.name}</b>`, { direction: 'top', offset: [0, -10] });
     marker.on('click', () => showNPCInfo(d));
@@ -326,6 +331,8 @@ var menuOrder = {
     "스폰": poiLayers['스폰'], "십이간지": poiLayers['십이간지'],
     "<span class='divider-line'></span>": L.layerGroup(),
     "👤 NPC": npcLayers,
+    "📜 히든퀘스트": questLayers,
+     "<span class='divider-line'></span> ": L.layerGroup(),
     "⛰️ 산(비석)": mountainLayers,
     "🔴 적환단": redHwanLayers,
     "🔍 탐색": discoveryLayers,
