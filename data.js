@@ -170,7 +170,7 @@ var npcData = [
     { name: "기록서", x: 1539, z: 4654, relation: "사도연퀘스트", file: "memo.png" },
     { name: "시녀", x: -6535, z: -2577, relation: "해무사퀘스트", file: "girl.png" },
     { name: "몰락한소가주", x: 3138, z: -2582, relation: "<span style='color:#ff0000;'>무인의거처(2층침대클릭시 힘+1)</span>", file: "sogaju.png" },
-    { name: "도공", x: -4786, z: 1442, relation: "", file: "dogong.png" },
+    { name: "도공", x: -4786, z: 1442, relation: "<span style='color:#a29bfe;'>*호리병을찾아서(무괴철1개,자금3개)</span>", file: "dogong.png" },
     { name: "도사", x: -1290, z: -591, relation: "*십이지신퀘스트<br>호리병을찾아서</br>", file: "dosa.png" },
     { name: "명인대장장이", x: -7051, z: -727, relation: "", file: "mungin.png" },
     { name: "망한대장장이", x: 5369, z: -3462, relation: "", file: "mang.png" },
