@@ -28,59 +28,28 @@
         }
         .sidebar-content { padding: 15px; }
 
-        /* 아이콘 그리드 스타일 */
-        .icon-grid {
-            display: flex;
-            justify-content: space-between;
-            gap: 8px;
-            margin-bottom: 15px;
-            width: 100%;
-        }
-        .icon-btn {
-            flex: 1;
-            aspect-ratio: 1 / 1;
-            background: #444;
-            border: 2px outset #666;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 4px;
-            box-sizing: border-box;
-        }
-        .icon-btn img {
-            width: 80%;
-            height: 80%;
-            object-fit: contain;
-        }
+        /* 아이콘 그리드 */
+        .icon-grid { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 15px; width: 100%; }
+        .icon-btn { flex: 1; aspect-ratio: 1 / 1; background: #444; border: 2px outset #666; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; box-sizing: border-box; }
+        .icon-btn img { width: 80%; height: 80%; object-fit: contain; }
         .icon-btn:hover { background: #555; border-color: var(--highlight); }
 
         /* 지도 영역 */
         #map-container { flex-grow: 1; position: relative; border-left: 2px solid #444; }
         #map { width: 100%; height: 100%; cursor: crosshair !important; }
 
-        /* 검색창 및 필터 */
-        .search-box {
-            width: 100%; padding: 12px; margin-bottom: 15px; box-sizing: border-box;
-            background: #111; border: 2px inset var(--border-color); color: #fff;
-        }
-        .filter-item { 
-            background: #444; border: 2px outset #666; margin-bottom: 8px; padding: 12px; 
-            color: var(--text-color); cursor: pointer; font-weight: bold; text-align: center;
-        }
+        /* 검색 및 필터 */
+        .search-box { width: 100%; padding: 12px; margin-bottom: 15px; box-sizing: border-box; background: #111; border: 2px inset var(--border-color); color: #fff; }
+        .filter-item { background: #444; border: 2px outset #666; margin-bottom: 8px; padding: 12px; color: var(--text-color); cursor: pointer; font-weight: bold; text-align: center; }
         .filter-item:hover { background: #555; border-color: var(--highlight); color: var(--highlight); }
 
-        /* 기존 버튼 및 UI 스타일 */
-        #toggle-btn, #open-btn {
-            background: #4a4a4a; color: var(--highlight); border: 2px solid var(--border-color);
-            font-weight: bold; cursor: pointer; padding: 5px 12px;
-            box-shadow: inset -2px -2px 0px #000, inset 2px 2px 0px #888;
-        }
+        /* 기존 버튼 */
+        #toggle-btn, #open-btn { background: #4a4a4a; color: var(--highlight); border: 2px solid var(--border-color); font-weight: bold; cursor: pointer; padding: 5px 12px; box-shadow: inset -2px -2px 0px #000, inset 2px 2px 0px #888; }
         #open-btn { display: none; position: absolute; left: 10px; top: 10px; z-index: 1000; padding: 10px 15px; }
         
-        /* Leaflet 오버라이드 */
-        .leaflet-control-attribution { background: none !important; box-shadow: none !important; border: none !important; padding: 0 !important; }
-        .leaflet-bottom.leaflet-right { display: flex !important; flex-direction: column-reverse !important; align-items: flex-end !important; gap: 10px !important; margin: 10px !important; }
+        /* Leaflet 강제 숨김 처리 */
+        .leaflet-control-attribution { display: none !important; }
+        .leaflet-bottom.leaflet-right { display: none !important; }
         .leaflet-control-zoom { border: none !important; box-shadow: none !important; }
     </style>
 </head>
@@ -93,14 +62,12 @@
             </div>
             <div class="sidebar-content">
                 <input type="text" id="search-input" placeholder="Search..." class="search-box">
-                
                 <div class="icon-grid">
                     <button class="icon-btn" id="btn-quest"><img src="images/icon/quest.png" alt="퀘스트"></button>
                     <button class="icon-btn" id="btn-youngdan"><img src="images/icon/youngdan.png" alt="영단"></button>
                     <button class="icon-btn" id="btn-skill"><img src="images/icon/skill.png" alt="스킬"></button>
                     <button class="icon-btn" id="btn-blacksmith"><img src="images/icon/blacksmith.png" alt="대장장이"></button>
                 </div>
-
                 <div class="filter-item">산/동상</div>
                 <div class="filter-item">NPC</div>
                 <div class="filter-item">십이지신</div>
