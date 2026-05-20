@@ -21,6 +21,9 @@ L.control.zoom({
 // [UI 구성] 로고 및 타일 설정
 const customAttribution = L.control.attribution({ position: 'bottomright', prefix: false });
 customAttribution.addAttribution(`<div class="forky-attribution"><img src="forky.png"><span>FORKY_G</span></div>`).addTo(map);
+L.control.attribution({
+    prefix: '<img src="forky.png" style="width:15px; vertical-align:middle; margin-right:3px;"> FORKY_G'
+}).addTo(map);
 
 L.TileLayer.include({
     getTileUrl: function (coords) {
