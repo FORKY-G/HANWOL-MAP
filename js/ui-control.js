@@ -74,3 +74,20 @@ document.addEventListener('DOMContentLoaded', () => {
         // createListItems('mines', mapData.mines, ...);
     }
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. 사냥터 목록 생성 (mapData.hunt 사용)
+    if (typeof mapData !== 'undefined' && mapData.hunt) {
+        createListItems('hunt', mapData.hunt, (coords) => {
+            // Leaflet 맵은 [위도, 경도]를 사용하므로 마크 좌표 [x, z]를 [z, x]로 변환
+            const latLng = [coords[2], coords[0]]; 
+            map.setView(latLng, 5);
+            
+            // 필요 시 여기서 해당 위치에 마커를 생성하는 로직 추가 가능
+            console.log("이동 좌표:", latLng);
+        });
+    }
+    
+    // 2. 십이지신 (추후 필요시)
+    // createListItems('zodiac', animals, ...);
+});
