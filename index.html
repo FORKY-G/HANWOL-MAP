@@ -6,99 +6,101 @@
     <link rel="icon" href="hanwol-icon.png" type="image/png" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        :root {
-            --bg-dark: #1a1a1a;
-            --panel-bg: #2b2b2b;
-            --border-color: #000000;
-            --highlight: #FFD700;
-            --text-color: #e0e0e0;
-        }
-
-        html, body { margin: 0; padding: 0; height: 100%; width: 100%; background: var(--bg-dark); overflow: hidden; font-family: 'Segoe UI', sans-serif; }
-        #wrapper { display: flex; width: 100vw; height: 100vh; }
-
+        html, body { margin: 0; padding: 0; height: 100%; width: 100%; background: #1a1a1a; overflow: hidden; }
+        
         /* 사이드바 스타일 */
-        #sidebar { 
-            width: 300px; background: var(--panel-bg); border-right: 6px solid var(--border-color); 
-            color: var(--text-color); transition: width 0.3s ease; overflow-y: auto;
-        }
-        .sidebar-header { 
-            padding: 20px; background: #333; border-bottom: 4px solid var(--border-color);
-            color: var(--highlight); font-weight: bold; display: flex; justify-content: space-between; align-items: center;
-        }
-        .sidebar-content { padding: 15px; }
+#sidebar {
+    position: absolute; left: 0; top: 0; width: 300px; height: 100%;
+    background: #2a2520; /* 어두운 나무색 */
+    border-right: 4px solid #8b5a2b;
+    z-index: 1000; color: #e3d2b0; padding: 15px; box-sizing: border-box;
+    transition: transform 0.3s ease;
+}
+#sidebar.closed { transform: translateX(-300px); }
 
-        /* 로고 고정 스타일 */
-        .custom-footer {
-            position: absolute; bottom: 10px; right: 10px; z-index: 1000;
-            background: rgba(0, 0, 0, 0.7); color: #fff; padding: 5px 10px; border-radius: 4px;
-            display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: bold;
-            pointer-events: none; border: 2px solid #444;
+#search-box {
+    width: 90%; padding: 8px; margin: 10px 5px;
+    background: #1a1a1a; border: 2px solid #554; color: #fff;
+}
+
+.menu-icons { display: flex; justify-content: space-around; padding: 10px; border-bottom: 1px solid #554; }
+.menu-icons img { width: 40px; height: 40px; cursor: pointer; border: 2px solid #554; background: #332; }
+
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; padding: 5px; }
+.row span { background: #3d352d; padding: 10px; text-align: center; border: 1px solid #554; cursor: pointer; }
+
+.menu-item { padding: 10px; background: #3d352d; margin: 5px; cursor: pointer; border: 1px solid #554; }
+.submenu { padding-left: 20px; background: #222; }
+.hidden { display: none; }
+
+        /* 지도 스타일 (단일 정의) */
+        #map { 
+            position: absolute; top: 0; left: 300px; 
+            width: calc(100vw - 300px); height: 100vh; 
+            transition: all 0.3s ease; 
+        }
+        #map.shifted { left: 0; width: 100vw; }
+
+        /* 토글 버튼 */
+        #sidebar-toggle {
+            position: absolute; left: 300px; top: 50%; z-index: 1001;
+            background: #4a3728; color: white; border: none; cursor: pointer; padding: 10px 5px;
+            transition: left 0.3s ease;
+        }
+        #sidebar-toggle.closed { left: 0; }
+
+        /* 포키 저작권 로고 */
+        .custom-footer { 
+            position: absolute; bottom: 10px; right: 10px; z-index: 1000; 
+            background: rgba(0, 0, 0, 0.7); color: #fff; padding: 5px 10px; 
+            border-radius: 4px; display: flex; align-items: center; gap: 8px; 
+            font-size: 14px; font-weight: bold; pointer-events: none; border: 2px solid #444; 
         }
         .custom-footer img { width: 20px; height: 20px; object-fit: contain; }
-
-        /* 아이콘 그리드 */
-        .icon-grid { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 15px; width: 100%; }
-        .icon-btn { flex: 1; aspect-ratio: 1 / 1; background: #444; border: 2px outset #666; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; box-sizing: border-box; }
-        .icon-btn img { width: 80%; height: 80%; object-fit: contain; }
-        .icon-btn:hover { background: #555; border-color: var(--highlight); }
-
-        /* 지도 영역 */
-        #map-container { flex-grow: 1; position: relative; border-left: 2px solid #444; }
-        #map { width: 100%; height: 100%; cursor: crosshair !important; }
-
-        /* 검색 및 필터 */
-        .search-box { width: 100%; padding: 12px; margin-bottom: 15px; box-sizing: border-box; background: #111; border: 2px inset var(--border-color); color: #fff; }
-        .filter-item { background: #444; border: 2px outset #666; margin-bottom: 8px; padding: 12px; color: var(--text-color); cursor: pointer; font-weight: bold; text-align: center; }
-        .filter-item:hover { background: #555; border-color: var(--highlight); color: var(--highlight); }
-
-        /* 기존 버튼 및 Leaflet 숨김 */
-        #toggle-btn, #open-btn { background: #4a4a4a; color: var(--highlight); border: 2px solid var(--border-color); font-weight: bold; cursor: pointer; padding: 5px 12px; box-shadow: inset -2px -2px 0px #000, inset 2px 2px 0px #888; }
-        #open-btn { display: none; position: absolute; left: 10px; top: 10px; z-index: 1000; padding: 10px 15px; }
-        .leaflet-control-attribution { display: none !important; }
-        .leaflet-bottom.leaflet-right { display: none !important; }
-        .leaflet-control-zoom { border: none !important; box-shadow: none !important; }
     </style>
 </head>
 <body>
-    <div id="wrapper">
-        <div id="sidebar">
-            <div class="sidebar-header">
-                <span>한월서버 전체지도</span>
-                <button id="toggle-btn">◀</button>
-            </div>
-            <div class="sidebar-content">
-                <input type="text" id="search-input" placeholder="Search..." class="search-box">
-                <div class="icon-grid">
-                    <button class="icon-btn" id="btn-quest"><img src="images/icon/quest.png" alt="퀘스트"></button>
-                    <button class="icon-btn" id="btn-youngdan"><img src="images/icon/youngdan.png" alt="영단"></button>
-                    <button class="icon-btn" id="btn-skill"><img src="images/icon/skill.png" alt="스킬"></button>
-                    <button class="icon-btn" id="btn-blacksmith"><img src="images/icon/blacksmith.png" alt="대장장이"></button>
-                </div>
-                <div class="filter-item">산/동상</div>
-                <div class="filter-item">NPC</div>
-                <div class="filter-item">십이지신</div>
-                <div class="filter-item">탐색(항아리)</div>
-                <div class="filter-item">의문의 상자</div>
-                <div class="filter-item">적환단</div>
-                <div class="filter-item">광산</div>
-                <div class="filter-item">사냥터</div>
-                <div class="filter-item">약초</div>
-            </div>
-        </div>
-        
-        <div id="map-container">
-            <div id="map"></div>
-            <button id="open-btn">▶</button>
-            <div class="custom-footer">
-                <img src="forky.png" alt="logo">
-                <span>FORKY_G</span>
-            </div>
-        </div>
+
+<div id="sidebar">
+    <div class="sidebar-header">한월서버 전체지도</div>
+    <input type="text" id="search-box" placeholder="이름 또는 아이템 검색...">
+
+    <div class="menu-icons">
+        <img src="images/icon/menu/quest.png" title="퀘스트">
+        <img src="images/icon/menu/youngdan.png" title="영단">
+        <img src="images/icon/menu/skill.png" title="스킬">
+        <img src="images/icon/menu/blacksmith.png" title="대장장이">
+    </div>
+<div class="menu-list">
+    <div class="row"><span>십이지신</span><span>산/동상</span></div>
+    <div class="row"><span>NPC</span><span>탐색(항아리)</span></div>
+    <div class="row"><span>적환단</span><span>의문의 상자</span></div>
+    
+    <div class="row">
+        <span onclick="toggleSub('hunt')">사냥터 ▼</span>
+        <span onclick="toggleSub('herbs')">약초 ▼</span>
+    </div>
+    
+    <div id="hunt" class="submenu hidden"></div>
+    <div id="herbs" class="submenu hidden"></div>
+
+    <div class="collapsible">
+        <div class="menu-item" onclick="toggleSub('mines')">광산 ▼</div>
+        <div id="mines" class="submenu hidden"></div>
+    </div>
+</div>
+
+    <button id="sidebar-toggle" onclick="toggleSidebar()">◀</button>
+    <div id="map"></div>
+
+    <div class="custom-footer">
+        <img src="forky.png" alt="logo">
+        <span>FORKY_G</span>
     </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="js/data.js"></script> <script src="js/map-logic.js"></script>
-<script src="js/ui-control.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/data.js"></script> 
+    <script src="js/map-logic.js"></script>
+    <script src="js/ui-control.js"></script>
 </body>
 </html>
