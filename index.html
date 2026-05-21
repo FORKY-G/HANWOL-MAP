@@ -49,6 +49,21 @@
         }
         #sidebar-toggle.closed { left: 0; }
 
+        /* 광산 버튼 스타일 (한 줄 가득) */
+.mine-full-btn {
+    width: 100%;
+    padding: 10px;
+    background: #3d352d;
+    border: 1px solid #554;
+    text-align: center;
+    cursor: pointer;
+    color: #e3d2b0;
+    box-sizing: border-box; /* 패딩이 가로 폭에 영향 주지 않게 */
+}
+.mine-full-btn:hover { background: #554a3d; }
+
+/* 기존 row 스타일은 유지하고 광산만 다르게 적용됨 */
+
         /* 포키 저작권 로고 */
         .custom-footer { 
             position: absolute; bottom: 10px; right: 10px; z-index: 1000; 
@@ -83,11 +98,10 @@
     <div id="hunt" class="submenu hidden"></div>
     <div id="herbs" class="submenu hidden"></div>
 
-    <div class="row">
-        <span onclick="toggleSub('mines')">광산 ▼</span>
-        <span></span> </div>
+    <div class="mine-container" style="padding: 5px;">
+        <div class="mine-full-btn" onclick="toggleSub('mines')">광산 ▼</div>
+    </div>
     <div id="mines" class="submenu hidden"></div>
-</div>
 </div>
 
     <button id="sidebar-toggle" onclick="toggleSidebar()">◀</button>
