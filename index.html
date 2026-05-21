@@ -32,6 +32,24 @@
         .submenu { background: #222; width: 100%; }
         .hidden { display: none; }
 
+        /* 1. 기본 스타일들에 마인크래프트 감성 테두리 추가 */
+.row span, .mine-full-btn, .submenu p {
+    border: 2px solid transparent; /* 기본 테두리는 투명하게 */
+    transition: all 0.1s ease;      /* 반응속도 빠르게 */
+}
+
+/* 2. 마우스를 올렸을 때 효과 (노란색 테두리) */
+.row span:hover, .mine-full-btn:hover, .submenu p:hover {
+    border: 2px solid #fce57e;      /* 마인크래프트 아이템 선택 시 느낌의 노란색 */
+    background: #554a3d !important; /* 배경색도 조금 더 밝게 */
+    color: #ffffff !important;      /* 글자도 조금 더 밝게 강조 */
+}
+
+/* 3. 광산 버튼용 특화 효과 */
+.mine-full-btn:hover {
+    border: 2px solid #fce57e;
+}
+
         /* 지도 스타일 */
         #map { position: absolute; top: 0; left: 300px; width: calc(100vw - 300px); height: 100vh; transition: all 0.3s ease; }
         #map.shifted { left: 0; width: 100vw; }
