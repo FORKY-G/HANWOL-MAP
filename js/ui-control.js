@@ -1,41 +1,57 @@
-// 1. 요소 선택
-const sidebar = document.getElementById('sidebar');
-const toggleBtn = document.getElementById('toggle-btn');
-const openBtn = document.getElementById('open-btn');
-const searchInput = document.getElementById('search-input');
-
-/**
- * [기능] 사이드바 토글 함수
- * @param {boolean} open - true면 열기, false면 닫기
- */
-function toggleSidebar(open) {
-    if (open) {
-        // 사이드바 열기
-        sidebar.style.width = '300px';
-        openBtn.style.display = 'none'; // ▶ 버튼 숨김
-    } else {
-        // 사이드바 닫기
-        sidebar.style.width = '0px';
-        openBtn.style.display = 'block'; // ▶ 버튼 표시
-    }
+// 1. 사이드바 토글
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('sidebar-toggle');
+    const mapDiv = document.getElementById('map');
     
-    // 지도 크기 최적화
+    sidebar.classList.toggle('closed');
+    toggleBtn.classList.toggle('closed');
+    mapDiv.classList.toggle('shifted');
+    
+    toggleBtn.innerText = sidebar.classList.contains('closed') ? '▶' : '◀';
+    
     setTimeout(() => {
-        if (typeof map !== 'undefined') map.invalidateSize();
+        map.invalidateSize();
     }, 300);
 }
 
-// 2. 이벤트 리스너 등록
-// 닫기(◀) 버튼
-toggleBtn.addEventListener('click', () => toggleSidebar(false));
+// 2. 하위 메뉴 토글
+function toggleSub(id) {
+    document.getElementById(id).classList.toggle('hidden');
+}
 
-// 열기(▶) 버튼
-openBtn.addEventListener('click', () => toggleSidebar(true));
-
-// 검색 로직
-searchInput.addEventListener('input', (e) => {
-    const keyword = e.target.value.toLowerCase();
-    document.querySelectorAll('.filter-item').forEach(item => {
-        item.style.display = item.innerText.toLowerCase().includes(keyword) ? 'block' : 'none';
+// 3. 통합된 리스트 생성 함수 (중앙 정렬 스타일 포함)
+function createListItems(containerId, dataArray, callback) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    container.innerHTML = '';
+    dataArray.forEach(item => {
+        let p = document.createElement('p');
+        p.innerText = item.name;
+        
+        // 스타일 적용
+        p.style.cursor = "pointer";
+        p.style.padding = "10px 5px";
+        p.style.margin = "2px 5px";
+        p.style.textAlign = "center"; // 중앙 정렬
+        p.style.background = "#3d352d";
+        p.style.border = "1px solid #554";
+        p.style.color = "#e3d2b0"; // 글자색 유지
+        
+        p.onmouseover = (e) => e.target.style.background = "#554a3d";
+        p.onmouseout = (e) => e.target.style.background = "#3d352d";
+        p.onclick = () => callback(item.coords);
+        
+        container.appendChild(p);
     });
+}
+
+// 4. 페이지 로드 시 데이터 연동
+document.addEventListener('DOMContentLoaded', () => {
+    if (typeof mapData !== 'undefined') {
+        createListItems('mines', mapData.mines, (coords) => map.setView(coords, 5));
+        createListItems('hunt', mapData.hunting, (coords) => map.setView(coords, 5));
+        createListItems('herbs', mapData.herbs, (coords) => map.setView(coords, 5));
+    }
 });
