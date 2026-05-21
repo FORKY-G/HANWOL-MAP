@@ -11,7 +11,7 @@ function toggleSidebar() {
     toggleBtn.innerText = sidebar.classList.contains('closed') ? '▶' : '◀';
     
     setTimeout(() => {
-        map.invalidateSize();
+        if (typeof map !== 'undefined') map.invalidateSize();
     }, 300);
 }
 
@@ -20,28 +20,41 @@ function toggleSub(id) {
     document.getElementById(id).classList.toggle('hidden');
 }
 
-// 3. 통합된 리스트 생성 함수 (중앙 정렬 스타일 포함)
+// 3. 통합 리스트 생성 함수 (중앙 정렬 및 스타일 최적화)
 function createListItems(containerId, dataArray, callback) {
     const container = document.getElementById(containerId);
     if (!container) return;
     
-    container.innerHTML = '';
+    container.innerHTML = ''; // 초기화
+    
     dataArray.forEach(item => {
         let p = document.createElement('p');
         p.innerText = item.name;
         
-        // 스타일 적용
+        // 스타일 적용 (사이드바의 row 스타일과 이질감 없도록 설정)
         p.style.cursor = "pointer";
         p.style.padding = "10px 5px";
         p.style.margin = "2px 5px";
-        p.style.textAlign = "center"; // 중앙 정렬
+        p.style.textAlign = "center"; 
         p.style.background = "#3d352d";
         p.style.border = "1px solid #554";
-        p.style.color = "#e3d2b0"; // 글자색 유지
+        p.style.color = "#e3d2b0";
+        p.style.borderRadius = "2px";
         
+        // 마우스 호버 효과
         p.onmouseover = (e) => e.target.style.background = "#554a3d";
         p.onmouseout = (e) => e.target.style.background = "#3d352d";
-        p.onclick = () => callback(item.coords);
+        
+        // 클릭 시 지도 이동
+        p.onclick = () => {
+            if (item.coords) {
+                // mapData에서 [x, y, z] 순서라면 [z, x]로 Leaflet 매핑
+                // coords가 [x, y, z]라면 [z, x] 순서로 setView 호출
+                const latLng = [item.coords[2], item.coords[0]]; 
+                map.setView(latLng, 5);
+                console.log(item.name + " 이동:", latLng);
+            }
+        };
         
         container.appendChild(p);
     });
@@ -50,8 +63,14 @@ function createListItems(containerId, dataArray, callback) {
 // 4. 페이지 로드 시 데이터 연동
 document.addEventListener('DOMContentLoaded', () => {
     if (typeof mapData !== 'undefined') {
-        createListItems('mines', mapData.mines, (coords) => map.setView(coords, 5));
-        createListItems('hunt', mapData.hunting, (coords) => map.setView(coords, 5));
-        createListItems('herbs', mapData.herbs, (coords) => map.setView(coords, 5));
+        // 사냥터 목록 (data.js에 정의된 mapData.hunting 사용)
+        createListItems('hunt', mapData.hunting, (coords) => {
+             const latLng = [coords[2], coords[0]];
+             map.setView(latLng, 5);
+        });
+        
+        // 약초와 광산도 필요 시 여기에 추가
+        // createListItems('herbs', mapData.herbs, ...);
+        // createListItems('mines', mapData.mines, ...);
     }
 });
