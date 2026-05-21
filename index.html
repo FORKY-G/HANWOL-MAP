@@ -9,62 +9,38 @@
         html, body { margin: 0; padding: 0; height: 100%; width: 100%; background: #1a1a1a; overflow: hidden; }
         
         /* 사이드바 스타일 */
-#sidebar {
-    position: absolute; left: 0; top: 0; width: 300px; height: 100%;
-    background: #2a2520; /* 어두운 나무색 */
-    border-right: 4px solid #8b5a2b;
-    z-index: 1000; color: #e3d2b0; padding: 15px; box-sizing: border-box;
-    transition: transform 0.3s ease;
-}
-#sidebar.closed { transform: translateX(-300px); }
-
-#search-box {
-    width: 90%; padding: 8px; margin: 10px 5px;
-    background: #1a1a1a; border: 2px solid #554; color: #fff;
-}
-
-.menu-icons { display: flex; justify-content: space-around; padding: 10px; border-bottom: 1px solid #554; }
-.menu-icons img { width: 40px; height: 40px; cursor: pointer; border: 2px solid #554; background: #332; }
-
-.row { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; padding: 5px; }
-.row span { background: #3d352d; padding: 10px; text-align: center; border: 1px solid #554; cursor: pointer; }
-
-.menu-item { padding: 10px; background: #3d352d; margin: 5px; cursor: pointer; border: 1px solid #554; }
-.submenu { padding-left: 20px; background: #222; }
-.hidden { display: none; }
-
-        /* 지도 스타일 (단일 정의) */
-        #map { 
-            position: absolute; top: 0; left: 300px; 
-            width: calc(100vw - 300px); height: 100vh; 
-            transition: all 0.3s ease; 
+        #sidebar {
+            position: absolute; left: 0; top: 0; width: 300px; height: 100%;
+            background: #2a2520; border-right: 4px solid #8b5a2b;
+            z-index: 1000; color: #e3d2b0; padding: 15px; box-sizing: border-box;
+            transition: transform 0.3s ease; display: flex; flex-direction: column;
         }
+        #sidebar.closed { transform: translateX(-300px); }
+
+        #search-box { width: 90%; padding: 8px; margin: 10px 5px; background: #1a1a1a; border: 2px solid #554; color: #fff; }
+
+        .menu-icons { display: flex; justify-content: space-around; padding: 10px; border-bottom: 1px solid #554; }
+        .menu-icons img { width: 40px; height: 40px; cursor: pointer; border: 2px solid #554; background: #332; }
+
+        .menu-list { display: flex; flex-direction: column; gap: 5px; margin-top: 10px; }
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+        .row span { background: #3d352d; padding: 10px; text-align: center; border: 1px solid #554; cursor: pointer; }
+
+        .mine-full-btn { width: 100%; padding: 10px; background: #3d352d; border: 1px solid #554; text-align: center; cursor: pointer; color: #e3d2b0; box-sizing: border-box; }
+        .mine-full-btn:hover { background: #554a3d; }
+
+        .submenu { background: #222; width: 100%; }
+        .hidden { display: none; }
+
+        /* 지도 스타일 */
+        #map { position: absolute; top: 0; left: 300px; width: calc(100vw - 300px); height: 100vh; transition: all 0.3s ease; }
         #map.shifted { left: 0; width: 100vw; }
 
         /* 토글 버튼 */
-        #sidebar-toggle {
-            position: absolute; left: 300px; top: 50%; z-index: 1001;
-            background: #4a3728; color: white; border: none; cursor: pointer; padding: 10px 5px;
-            transition: left 0.3s ease;
-        }
+        #sidebar-toggle { position: absolute; left: 300px; top: 50%; z-index: 1001; background: #4a3728; color: white; border: none; cursor: pointer; padding: 10px 5px; transition: left 0.3s ease; }
         #sidebar-toggle.closed { left: 0; }
 
-        /* 광산 버튼 스타일 (한 줄 가득) */
-.mine-full-btn {
-    width: 100%;
-    padding: 10px;
-    background: #3d352d;
-    border: 1px solid #554;
-    text-align: center;
-    cursor: pointer;
-    color: #e3d2b0;
-    box-sizing: border-box; /* 패딩이 가로 폭에 영향 주지 않게 */
-}
-.mine-full-btn:hover { background: #554a3d; }
-
-/* 기존 row 스타일은 유지하고 광산만 다르게 적용됨 */
-
-        /* 포키 저작권 로고 */
+        /* 저작권 로고 */
         .custom-footer { 
             position: absolute; bottom: 10px; right: 10px; z-index: 1000; 
             background: rgba(0, 0, 0, 0.7); color: #fff; padding: 5px 10px; 
@@ -86,35 +62,35 @@
         <img src="images/icon/menu/skill.png" title="스킬">
         <img src="images/icon/menu/blacksmith.png" title="대장장이">
     </div>
-<div class="menu-list">
-    <div class="row"><span>십이지신</span><span>산/동상</span></div>
-    <div class="row"><span>NPC</span><span>탐색(항아리)</span></div>
-    <div class="row"><span>적환단</span><span>의문의 상자</span></div>
-    
-    <div class="row">
-        <span onclick="toggleSub('hunt')">사냥터 ▼</span>
-        <span onclick="toggleSub('herbs')">약초 ▼</span>
-    </div>
-    <div id="hunt" class="submenu hidden"></div>
-    <div id="herbs" class="submenu hidden"></div>
 
-    <div class="mine-container" style="padding: 5px;">
+    <div class="menu-list">
+        <div class="row"><span>십이지신</span><span>산/동상</span></div>
+        <div class="row"><span>NPC</span><span>탐색(항아리)</span></div>
+        <div class="row"><span>적환단</span><span>의문의 상자</span></div>
+        
+        <div class="row">
+            <span onclick="toggleSub('hunt')">사냥터 ▼</span>
+            <span onclick="toggleSub('herbs')">약초 ▼</span>
+        </div>
+        <div id="hunt" class="submenu hidden"></div>
+        <div id="herbs" class="submenu hidden"></div>
+
         <div class="mine-full-btn" onclick="toggleSub('mines')">광산 ▼</div>
+        <div id="mines" class="submenu hidden"></div>
     </div>
-    <div id="mines" class="submenu hidden"></div>
 </div>
 
-    <button id="sidebar-toggle" onclick="toggleSidebar()">◀</button>
-    <div id="map"></div>
+<button id="sidebar-toggle" onclick="toggleSidebar()">◀</button>
+<div id="map"></div>
 
-    <div class="custom-footer">
-        <img src="forky.png" alt="logo">
-        <span>FORKY_G</span>
-    </div>
+<div class="custom-footer">
+    <img src="forky.png" alt="logo">
+    <span>FORKY_G</span>
+</div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="js/data.js"></script> 
-    <script src="js/map-logic.js"></script>
-    <script src="js/ui-control.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="js/data.js"></script> 
+<script src="js/map-logic.js"></script>
+<script src="js/ui-control.js"></script>
 </body>
 </html>
